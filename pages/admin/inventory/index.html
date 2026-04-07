@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Kho - Fan Shop</title>
+    <link rel="stylesheet" href="../../../shared/css/common.css">
+    <link rel="stylesheet" href="../../../shared/css/components.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h2>🎛️ Quản Trị</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="../dashboard/index.html" class="sidebar-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Tổng Quan</span>
+                </a>
+                <a href="../orders/index.html" class="sidebar-item">
+                    <span class="nav-icon">🛒</span>
+                    <span>Đơn Hàng</span>
+                </a>
+                <a href="../inventory/index.html" class="sidebar-item active">
+                    <span class="nav-icon">📦</span>
+                    <span>Quản Lý Kho</span>
+                </a>
+                <a href="../products/index.html" class="sidebar-item">
+                    <span class="nav-icon">🏷️</span>
+                    <span>Sản Phẩm</span>
+                </a>
+                <a href="../users/index.html" class="sidebar-item">
+                    <span class="nav-icon">👥</span>
+                    <span>Người Dùng</span>
+                </a>
+                <a href="../posts/index.html" class="sidebar-item">
+                    <span class="nav-icon">📰</span>
+                    <span>Tin Tức</span>
+                </a>
+                <a href="../activity/index.html" class="sidebar-item">
+                    <span class="nav-icon">📈</span>
+                    <span>Hoạt Động</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <div class="admin-container">
+                <div class="admin-section">
+                    <h2>📊 Quản Lý Kho</h2>
+                    <div class="inventory-alert" id="low-stock-alert" style="display: none;">
+                        <span class="alert-icon">⚠️</span>
+                        <span id="low-stock-message">Có sản phẩm sắp hết hàng!</span>
+                    </div>
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Giá</th>
+                                    <th>Tồn kho</th>
+                                    <th>Đã bán</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table">
+                                <tr>
+                                    <td colspan="7" class="empty-msg">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="../../../shared/js/utils.js"></script>
+    <script src="../../../shared/js/auth.js"></script>
+    <script src="../../../shared/js/products.js"></script>
+    <script src="../../../shared/js/sample-data.js"></script>
+    <script src="../../../shared/js/cart.js"></script>
+    <script src="../../../shared/js/navigation.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

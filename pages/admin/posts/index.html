@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Tin Tức - Fan Shop</title>
+    <link rel="stylesheet" href="../../../shared/css/common.css">
+    <link rel="stylesheet" href="../../../shared/css/components.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h2>🎛️ Quản Trị</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="../dashboard/index.html" class="sidebar-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Tổng Quan</span>
+                </a>
+                <a href="../orders/index.html" class="sidebar-item">
+                    <span class="nav-icon">🛒</span>
+                    <span>Đơn Hàng</span>
+                </a>
+                <a href="../inventory/index.html" class="sidebar-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Quản Lý Kho</span>
+                </a>
+                <a href="../products/index.html" class="sidebar-item">
+                    <span class="nav-icon">🏷️</span>
+                    <span>Sản Phẩm</span>
+                </a>
+                <a href="../users/index.html" class="sidebar-item">
+                    <span class="nav-icon">👥</span>
+                    <span>Người Dùng</span>
+                </a>
+                <a href="../posts/index.html" class="sidebar-item active">
+                    <span class="nav-icon">📰</span>
+                    <span>Tin Tức</span>
+                </a>
+                <a href="../activity/index.html" class="sidebar-item">
+                    <span class="nav-icon">📈</span>
+                    <span>Hoạt Động</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <div class="admin-container">
+                <div class="admin-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2 style="margin: 0;">📰 Quản Lý Tin Tức</h2>
+                        <button class="btn" onclick="showAddPostForm()">+ Thêm bài viết</button>
+                    </div>
+                    
+                    <div id="add-post-form" style="display: none; margin-bottom: 24px;">
+                        <div class="form-card">
+                            <h3 id="post-form-title">Thêm Bài Viết Mới</h3>
+                            <input type="hidden" id="post-id">
+                            <div class="form-group">
+                                <label>Tiêu đề</label>
+                                <input type="text" id="post-title" placeholder="Nhập tiêu đề bài viết">
+                            </div>
+                            <div class="form-group">
+                                <label>Danh mục</label>
+                                <select id="post-category">
+                                    <option value="Sản phẩm">Sản phẩm</option>
+                                    <option value="Hướng dẫn">Hướng dẫn</option>
+                                    <option value="Khuyến mãi">Khuyến mãi</option>
+                                    <option value="Công nghệ">Công nghệ</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Mô tả ngắn</label>
+                                <textarea id="post-excerpt" rows="3" placeholder="Nhập mô tả ngắn"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>URL hình ảnh</label>
+                                <input type="text" id="post-image" placeholder="https://...">
+                            </div>
+                            <div style="display: flex; gap: 12px;">
+                                <button class="btn" onclick="addBlogPost()">Lưu bài viết</button>
+                                <button class="btn btn-secondary" onclick="hideAddPostForm()">Hủy</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Danh mục</th>
+                                    <th>Ngày đăng</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="posts-table">
+                                <tr>
+                                    <td colspan="5" class="empty-msg">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="../../../shared/js/utils.js"></script>
+    <script src="../../../shared/js/auth.js"></script>
+    <script src="../../../shared/js/products.js"></script>
+    <script src="../../../shared/js/sample-data.js"></script>
+    <script src="../../../shared/js/cart.js"></script>
+    <script src="../../../shared/js/navigation.js"></script>
+    <script src="script.js?v=2"></script>
+</body>
+</html>

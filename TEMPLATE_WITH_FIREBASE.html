@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Title - Fan Shop</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../shared/css/common.css">
+    <link rel="stylesheet" href="../../shared/css/components.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <main class="container">
+        <!-- Your content here -->
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- Firebase Scripts (QUAN TRỌNG: Load trước các script khác) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Firebase Config -->
+    <script src="../../shared/js/firebase-config.js"></script>
+    
+    <!-- Firebase Modules -->
+    <script src="../../shared/js/firebase-auth.js"></script>
+    <script src="../../shared/js/firebase-products.js"></script>
+    
+    <!-- Existing Scripts -->
+    <script src="../../shared/js/utils.js"></script>
+    <script src="../../shared/js/auth.js"></script>
+    <script src="../../shared/js/products.js"></script>
+    
+    <!-- Database Adapter (QUAN TRỌNG: Load sau tất cả) -->
+    <script src="../../shared/js/db-adapter.js"></script>
+    
+    <!-- Cart & Navigation -->
+    <script src="../../shared/js/cart.js"></script>
+    <script src="../../shared/js/navigation.js"></script>
+    
+    <!-- Page Script -->
+    <script src="script.js"></script>
+</body>
+</html>

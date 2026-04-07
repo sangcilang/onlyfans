@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Liên hệ - Fan Shop</title>
+    <link rel="stylesheet" href="/shared/css/common.css">
+    <link rel="stylesheet" href="/shared/css/components.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <main class="container">
+        <h2 class="section-title">Liên hệ với chúng tôi</h2>
+        
+        <div class="contact-box">
+            <div class="contact-info">
+                <h3>Thông tin cửa hàng</h3>
+                <p>📍 <strong>Địa chỉ:</strong> 123 Đường Cầu Giấy, Hà Nội</p>
+                <p>📞 <strong>Hotline:</strong> 1900 1234</p>
+                <p>📧 <strong>Email:</strong> hotro@fanshop.vn</p>
+                <p>⏰ <strong>Giờ làm việc:</strong> 08:00 - 21:00 (Tất cả các ngày)</p>
+            </div>
+
+            <div class="contact-form-wrapper">
+                <form onsubmit="handleContactSubmit(event)">
+                    <div class="form-group">
+                        <label>Họ và tên</label>
+                        <input type="text" id="contact-name" placeholder="Nhập tên của bạn" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Số điện thoại / Email</label>
+                        <input type="text" id="contact-info" placeholder="Để chúng tôi liên hệ lại" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Lời nhắn</label>
+                        <textarea id="contact-message" rows="4" placeholder="Nội dung cần hỗ trợ..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn">GỬI YÊU CẦU NGAY</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="/shared/js/utils.js"></script>
+    <script src="/shared/js/auth.js"></script>
+    <script src="/shared/js/cart.js"></script>
+    <script src="/shared/js/navigation.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tổng Quan - Fan Shop</title>
+    <link rel="stylesheet" href="../../../shared/css/common.css">
+    <link rel="stylesheet" href="../../../shared/css/components.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h2>🎛️ Quản Trị</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="../dashboard/index.html" class="sidebar-item active">
+                    <span class="nav-icon">📊</span>
+                    <span>Tổng Quan</span>
+                </a>
+                <a href="../orders/index.html" class="sidebar-item">
+                    <span class="nav-icon">🛒</span>
+                    <span>Đơn Hàng</span>
+                </a>
+                <a href="../inventory/index.html" class="sidebar-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Quản Lý Kho</span>
+                </a>
+                <a href="../products/index.html" class="sidebar-item">
+                    <span class="nav-icon">🏷️</span>
+                    <span>Sản Phẩm</span>
+                </a>
+                <a href="../users/index.html" class="sidebar-item">
+                    <span class="nav-icon">👥</span>
+                    <span>Người Dùng</span>
+                </a>
+                <a href="../posts/index.html" class="sidebar-item">
+                    <span class="nav-icon">📰</span>
+                    <span>Tin Tức</span>
+                </a>
+                <a href="../activity/index.html" class="sidebar-item">
+                    <span class="nav-icon">📈</span>
+                    <span>Hoạt Động</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="admin-container">
+                <h1 class="admin-title">📊 Tổng Quan</h1>
+        
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <h3 id="total-users">0</h3>
+                            <p>Người dùng</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <h3 id="total-products">11</h3>
+                            <p>Sản phẩm</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">🛒</div>
+                        <div class="stat-info">
+                            <h3 id="total-orders">0</h3>
+                            <p>Đơn hàng</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <h3 id="total-revenue">0đ</h3>
+                            <p>Doanh thu</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>📈 Doanh Thu 7 Ngày Gần Đây</h3>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3>📊 Trạng Thái Đơn Hàng</h3>
+                        <canvas id="orderStatusChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3>🏆 Top 5 Sản Phẩm Bán Chạy</h3>
+                        <canvas id="topProductsChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3>👥 Người Dùng Mới Theo Tháng</h3>
+                        <canvas id="newUsersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="../../../shared/js/utils.js"></script>
+    <script src="../../../shared/js/auth.js"></script>
+    <script src="../../../shared/js/products.js"></script>
+    <script src="../../../shared/js/sample-data.js"></script>
+    <script src="../../../shared/js/cart.js"></script>
+    <script src="../../../shared/js/navigation.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

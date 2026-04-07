@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Sản Phẩm - Fan Shop</title>
+    <link rel="stylesheet" href="../../../shared/css/common.css">
+    <link rel="stylesheet" href="../../../shared/css/components.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h2>🎛️ Quản Trị</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="../dashboard/index.html" class="sidebar-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Tổng Quan</span>
+                </a>
+                <a href="../orders/index.html" class="sidebar-item">
+                    <span class="nav-icon">🛒</span>
+                    <span>Đơn Hàng</span>
+                </a>
+                <a href="../inventory/index.html" class="sidebar-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Quản Lý Kho</span>
+                </a>
+                <a href="../products/index.html" class="sidebar-item active">
+                    <span class="nav-icon">🏷️</span>
+                    <span>Sản Phẩm</span>
+                </a>
+                <a href="../users/index.html" class="sidebar-item">
+                    <span class="nav-icon">👥</span>
+                    <span>Người Dùng</span>
+                </a>
+                <a href="../posts/index.html" class="sidebar-item">
+                    <span class="nav-icon">📰</span>
+                    <span>Tin Tức</span>
+                </a>
+                <a href="../activity/index.html" class="sidebar-item">
+                    <span class="nav-icon">📈</span>
+                    <span>Hoạt Động</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <div class="admin-container">
+                <div class="admin-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2 style="margin: 0;">📦 Quản Lý Sản Phẩm</h2>
+                        <button class="btn" onclick="showAddProductForm()">+ Thêm sản phẩm</button>
+                    </div>
+                    
+                    <div id="add-product-form" style="display: none; margin-bottom: 24px;">
+                        <div class="form-card">
+                            <h3 id="product-form-title">Thêm Sản Phẩm Mới</h3>
+                            <input type="hidden" id="product-id">
+                            <div class="form-group">
+                                <label>Tên sản phẩm</label>
+                                <input type="text" id="product-name" placeholder="Nhập tên sản phẩm">
+                            </div>
+                            <div class="form-group">
+                                <label>Giá (VNĐ)</label>
+                                <input type="number" id="product-price" placeholder="450000">
+                            </div>
+                            <div class="form-group">
+                                <label>URL hình ảnh</label>
+                                <input type="text" id="product-image" placeholder="https://...">
+                            </div>
+                            <div class="form-group">
+                                <label>Badge</label>
+                                <input type="text" id="product-badge" placeholder="Yêu thích, Bán chạy, Mall...">
+                            </div>
+                            <div class="form-group">
+                                <label>Đã bán</label>
+                                <input type="text" id="product-sold" placeholder="1,2k">
+                            </div>
+                            <div class="form-group">
+                                <label>Tồn kho</label>
+                                <input type="number" id="product-stock" placeholder="100" value="100">
+                            </div>
+                            <div style="display: flex; gap: 12px;">
+                                <button class="btn" onclick="saveProduct()">Lưu sản phẩm</button>
+                                <button class="btn btn-secondary" onclick="hideProductForm()">Hủy</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Giá</th>
+                                    <th>Badge</th>
+                                    <th>Đã bán</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="products-table">
+                                <tr>
+                                    <td colspan="6" class="empty-msg">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="../../../shared/js/utils.js"></script>
+    <script src="../../../shared/js/auth.js"></script>
+    <script src="../../../shared/js/products.js"></script>
+    <script src="../../../shared/js/sample-data.js"></script>
+    <script src="../../../shared/js/cart.js"></script>
+    <script src="../../../shared/js/navigation.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

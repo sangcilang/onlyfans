@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Liên hệ - Fan Shop</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Bổ sung một chút CSS riêng cho Form để đẹp hơn */
+        .contact-box { background: white; padding: 30px; border-radius: 8px; display: flex; gap: 30px; flex-wrap: wrap; }
+        .contact-info { flex: 1; min-width: 250px; border-right: 1px solid #eee; padding-right: 20px; }
+        .contact-form-wrapper { flex: 2; min-width: 300px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; outline: none; }
+        .form-group input:focus { border-color: var(--green-primary); }
+    </style>
+</head>
+<body>
+    <header class="shopee-header">
+        <div class="header-content">
+            <div class="logo">Fan Shop</div>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Bạn cần hỗ trợ gì?">
+                <button onclick="searchProduct()">🔍</button>
+            </div>
+            <div class="cart-icon">
+                <a href="gio-hang.html">🛒 Giỏ hàng (<span id="cart-count">0</span>)</a>
+            </div>
+        </div>
+        <nav class="sub-nav">
+            <ul class="menu">
+                <li><a href="index.html">Trang chủ</a></li>
+                <li><a href="gioi-thieu.html">Giới thiệu</a></li>
+                <li><a href="chinh-sach.html">Chính sách</a></li>
+                <li><a href="lien-he.html">Liên hệ</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2 class="section-title">Liên hệ với chúng tôi</h2>
+        
+        <div class="contact-box">
+            <div class="contact-info">
+                <h3 style="color: var(--green-primary);">Thông tin cửa hàng</h3>
+                <p style="margin-top: 15px;">📍 <strong>Địa chỉ:</strong> 123 Đường Cầu Giấy, Hà Nội</p>
+                <p>📞 <strong>Hotline:</strong> 1900 1234</p>
+                <p>📧 <strong>Email:</strong> hotro@fanshop.vn</p>
+                <p>⏰ <strong>Giờ làm việc:</strong> 08:00 - 21:00 (Tất cả các ngày)</p>
+            </div>
+
+            <div class="contact-form-wrapper">
+                <form onsubmit="alert('Cảm ơn bạn! Thông tin đã được gửi đến bộ phận chăm sóc khách hàng.'); return false;">
+                    <div class="form-group">
+                        <label>Họ và tên</label>
+                        <input type="text" placeholder="Nhập tên của bạn" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Số điện thoại / Email</label>
+                        <input type="text" placeholder="Để chúng tôi liên hệ lại" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Lời nhắn</label>
+                        <textarea rows="4" placeholder="Nội dung cần hỗ trợ..." required></textarea>
+                    </div>
+                    <button type="submit" style="width: 100%; padding: 12px; background: var(--green-primary); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                        GỬI YÊU CẦU NGAY
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Fan Shop - Đồ án Web đầu tay</p>
+    </footer>
+</body>
+</html>

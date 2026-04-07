@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fan Shop - Mua sắm giá tốt</title>
+    <link rel="stylesheet" href="../../shared/css/common.css">
+    <link rel="stylesheet" href="../../shared/css/components.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <!-- Promotion Popup -->
+    <div id="promotion-popup" class="popup-overlay" style="display: none;">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closePromotionPopup()">✕</button>
+            <div class="popup-icon">🎉</div>
+            <h2 id="popup-title">Khuyến Mãi Đặc Biệt!</h2>
+            <p id="popup-excerpt"></p>
+            
+            <!-- Promotion Navigation -->
+            <div class="promotion-nav" id="promotion-nav" style="display: none;">
+                <button class="nav-arrow nav-prev" onclick="previousPromotion()" id="prev-btn">‹</button>
+                <div class="promotion-dots" id="promotion-dots"></div>
+                <button class="nav-arrow nav-next" onclick="nextPromotion()" id="next-btn">›</button>
+            </div>
+            
+            <div class="popup-actions">
+                <button class="btn" onclick="viewPromotionDetails()">Xem Chi Tiết</button>
+                <button class="btn btn-secondary" onclick="closePromotionPopup()">Đóng</button>
+            </div>
+            <label class="popup-checkbox">
+                <input type="checkbox" id="dont-show-again" onchange="handleDontShowAgain()">
+                <span>Không hiển thị lại hôm nay</span>
+            </label>
+        </div>
+    </div>
+
+    <main>
+        <section class="shopee-banner">
+            <img src="https://images.unsplash.com/photo-1556740758-90de374c12ad?auto=format&fit=crop&q=80&w=1200&h=400" alt="Banner Quạt Mát">
+        </section>
+
+        <div class="main-layout">
+            <!-- Left Sidebar - Top Products -->
+            <aside class="sidebar-left">
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">🏆 Top 10 Bán Chạy</h3>
+                    
+                    <div class="time-filter">
+                        <button class="filter-btn active" onclick="filterTopProducts('day')">Hôm nay</button>
+                        <button class="filter-btn" onclick="filterTopProducts('month')">Tháng</button>
+                        <button class="filter-btn" onclick="filterTopProducts('year')">Năm</button>
+                    </div>
+                    
+                    <div class="sidebar-scroll">
+                        <div class="top-products-list" id="top-products-list">
+                            <!-- Top products will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <section class="main-content">
+                <div class="container">
+                    <h2 class="section-title">GỢI Ý HÔM NAY</h2>
+                    <div class="product-grid" id="productGrid">
+                        <!-- Products will be loaded dynamically -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Right Sidebar - News -->
+            <aside class="sidebar-right">
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">📰 Tin Tức Mới</h3>
+                    
+                    <div class="sidebar-scroll">
+                        <div class="news-list" id="news-list">
+                            <!-- News will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="../../shared/js/utils.js"></script>
+    <script src="../../shared/js/auth.js"></script>
+    <script src="../../shared/js/products.js"></script>
+    <script src="../../shared/js/sample-data.js"></script>
+    <script src="../../shared/js/cart.js"></script>
+    <script src="../../shared/js/navigation.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+                <div class="product-card" data-name="Quạt Trần Panasonic 5 Cánh">
+                    <div class="badge">Yêu thích</div>
+                    <img src="https://images.unsplash.com/photo-1591193512858-aa2072120ecf?auto=format&fit=crop&q=80&w=200" alt="Quạt">
+                    <div class="info">
+                        <h3>Quạt Trần Panasonic F-60TDN 5 Cánh</h3>
+                        <p class="price">4.500.000đ</p>
+                        <p class="sold">Đã bán 1,2k</p>
+                        <button onclick="addToCart('Quạt Trần Panasonic 5 Cánh', 4500000)">Thêm vào giỏ</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-name="Quạt Đứng Senko">
+                    <div class="badge">Rẻ vô địch</div>
+                    <img src="https://images.unsplash.com/photo-1618961734760-466979ce35b0?auto=format&fit=crop&q=80&w=200" alt="Quạt">
+                    <div class="info">
+                        <h3>Quạt Đứng Senko DCN1806 Công Suất Lớn</h3>
+                        <p class="price">450.000đ</p>
+                        <p class="sold">Đã bán 5,6k</p>
+                        <button onclick="addToCart('Quạt Đứng Senko', 450000)">Thêm vào giỏ</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-name="Quạt Tích Điện Xiaomi">
+                    <div class="badge">Mall</div>
+                    <img src="https://images.unsplash.com/photo-1544641913-e9d6824905a9?auto=format&fit=crop&q=80&w=200" alt="Quạt">
+                    <div class="info">
+                        <h3>Quạt Tích Điện Thông Minh Xiaomi Gen 3</h3>
+                        <p class="price">1.890.000đ</p>
+                        <p class="sold">Đã bán 800</p>
+                        <button onclick="addToCart('Quạt Tích Điện Xiaomi', 1890000)">Thêm vào giỏ</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-name="Quạt Hơi Nước Sunhouse">
+                    <div class="badge">Giảm 20%</div>
+                    <img src="https://images.unsplash.com/photo-1585338107529-13afc5f02586?auto=format&fit=crop&q=80&w=200" alt="Quạt">
+                    <div class="info">
+                        <h3>Quạt Điều Hòa Hơi Nước Sunhouse SHD7727</h3>
+                        <p class="price">2.450.000đ</p>
+                        <p class="sold">Đã bán 300</p>
+                        <button onclick="addToCart('Quạt Hơi Nước Sunhouse', 2450000)">Thêm vào giỏ</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-name="Quạt Bàn Mitsubishi">
+                    <div class="badge">Yêu thích</div>
+                    <img src="https://images.unsplash.com/photo-1565151443833-29bf2ba5dd8d?auto=format&fit=crop&q=80&w=200" alt="Quạt">
+                    <div class="info">
+                        <h3>Quạt Bàn Mitsubishi D16-GV Có Hẹn Giờ</h3>
+                        <p class="price">950.000đ</p>
+                        <p class="sold">Đã bán 1,1k</p>
+                        <button onclick="addToCart('Quạt Bàn Mitsubishi', 950000)">Thêm vào giỏ</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-name="Quạt Treo Tường Asia">
+                    <div class="badge">Bán chạy</div>
+                    <img src="https://images.unsplash.com/photo-1622838320004-71155c3e3bbd?auto=format&fit=crop&q=80&w=200" alt="Quạt">
+                    <div class="info">
+                        <h3>Quạt Treo Tường Asia L16006 Remote</h3>
+                        <p class="price">680.000đ</p>
+                        <p class="sold">Đã bán 2,2k</p>
+                        <button onclick="addToCart('Quạt Treo Tường Asia', 680000)">Thêm vào giỏ</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-name="Quạt Hộp KDK">
+                    <div class="badge">Yêu thích</div>
+                    <img src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&q=80&w=200" alt="Quạt">
+                    <div class="info">
+                        <h3>Quạt Hộp Tản Gió KDK C3TRK Cao Cấp</h3>
+                        <p class="price">1.200.000đ</p>
+                        <p class="sold">Đã bán 150</p>
+                        <button onclick="addToCart('Quạt Hộp KDK', 1200000)">Thêm vào giỏ</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-name="Quạt Mini Cầm Tay">
+                    <div class="badge">Chỉ 99k</div>
+                    <img src="https://images.unsplash.com/photo-1591193512858-aa2072120ecf?auto=format&fit=crop&q=80&w=200" alt="Quạt">
+                    <div class="info">
+                        <h3>Quạt Mini Cầm Tay Tích Điện USB</h3>
+                        <p class="price">99.000đ</p>
+                        <p class="sold">Đã bán 10k+</p>
+                        <button onclick="addToCart('Quạt Mini Cầm Tay', 99000)">Thêm vào giỏ</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-name="Quạt Tháp Tiross">
+                    <div class="badge">Mall</div>
+                    <img src="https://images.unsplash.com/photo-1585338107529-13afc5f02586?auto=format&fit=crop&q=80&w=200" alt="Quạt">
+                    <div class="info">
+                        <h3>Quạt Tháp Tiross TS9182 Có Điều Khiển</h3>
+                        <p class="price">2.150.000đ</p>
+                        <p class="sold">Đã bán 450</p>
+                        <button onclick="addToCart('Quạt Tháp Tiross', 2150000)">Thêm vào giỏ</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-name="Quạt Thông Gió Vinawind">
+                    <div class="badge">Bền bỉ</div>
+                    <img src="https://images.unsplash.com/photo-1618961734760-466979ce35b0?auto=format&fit=crop&q=80&w=200" alt="Quạt">
+                    <div class="info">
+                        <h3>Quạt Thông Gió Vinawind QTT300-PN</h3>
+                        <p class="price">320.000đ</p>
+                        <p class="sold">Đã bán 900</p>
+                        <button onclick="addToCart('Quạt Thông Gió Vinawind', 320000)">Thêm vào giỏ</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-name="Quạt Trần Panasonic">
+                    <div class="badge">Yêu thích</div>
+                    <img src="https://via.placeholder.com/200x200" alt="Quạt">
+                    <div class="info">
+                        <h3>Quạt Trần Panasonic Gen 2</h3>
+                        <p class="price">1.500.000đ</p>
+                        <p class="sold">Đã bán 1,2k</p>
+                        <button onclick="addToCart('Quạt Trần Panasonic', 1500000)">Thêm vào giỏ</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="/shared/js/utils.js"></script>
+    <script src="/shared/js/auth.js"></script>
+    <script src="/shared/js/cart.js"></script>
+    <script src="/shared/js/navigation.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

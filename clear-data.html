@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xóa Dữ Liệu - Fan Shop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            margin: 10px;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(107, 114, 128, 0.3);
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #10b981;
+        }
+        
+        .message.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 2px solid #3b82f6;
+        }
+        
+        .stats {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .stats h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🗑️</div>
+        <h1>Xóa Dữ Liệu</h1>
+        
+        <div id="message" class="message"></div>
+        
+        <div id="stats" class="stats" style="display: none;">
+            <h3>📊 Dữ liệu hiện tại:</h3>
+            <div class="stat-item">
+                <span class="stat-label">Người dùng:</span>
+                <span class="stat-value" id="users-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Sản phẩm:</span>
+                <span class="stat-value" id="products-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Đơn hàng:</span>
+                <span class="stat-value" id="orders-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Tin tức:</span>
+                <span class="stat-value" id="posts-count">0</span>
+            </div>
+        </div>
+        
+        <p>Xóa tất cả dữ liệu (người dùng, sản phẩm, đơn hàng, tin tức) và tạo lại dữ liệu mẫu mới với ảnh ngẫu nhiên.</p>
+        
+        <div>
+            <button class="btn btn-danger" onclick="clearAndReload()">🗑️ Xóa & Tạo Lại</button>
+            <button class="btn btn-secondary" onclick="checkData()">📊 Kiểm Tra Dữ Liệu</button>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <a href="index.html" class="btn btn-success">🏠 Về Trang Chủ</a>
+        </div>
+    </div>
+
+    <script src="shared/js/utils.js"></script>
+    <script src="shared/js/sample-data.js"></script>
+    <script>
+        function showMessage(text, type = 'info') {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+            messageEl.style.display = 'block';
+        }
+        
+        function checkData() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const blogPosts = JSON.parse(localStorage.getItem('blogPosts')) || [];
+            
+            document.getElementById('users-count').textContent = users.length;
+            document.getElementById('products-count').textContent = products.length;
+            document.getElementById('orders-count').textContent = orders.length;
+            document.getElementById('posts-count').textContent = blogPosts.length;
+            
+            document.getElementById('stats').style.display = 'block';
+            showMessage('Đã tải thông tin dữ liệu hiện tại', 'info');
+        }
+        
+        function clearAndReload() {
+            if (confirm('⚠️ Bạn có chắc muốn xóa TẤT CẢ dữ liệu và tạo lại? Hành động này không thể hoàn tác!')) {
+                showMessage('🔄 Đang xóa dữ liệu...', 'info');
+                
+                // Xóa tất cả dữ liệu
+                localStorage.removeItem('users');
+                localStorage.removeItem('products');
+                localStorage.removeItem('orders');
+                localStorage.removeItem('blogPosts');
+                
+                // Xóa tất cả giỏ hàng
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('cart_')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                
+                // Xóa flag để cho phép tạo dữ liệu mới
+                sessionStorage.removeItem('data_just_initialized');
+                
+                showMessage('✅ Đã xóa dữ liệu! Đang tải lại trang...', 'success');
+                
+                // Reload sau 1 giây
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            }
+        }
+        
+        // Tự động kiểm tra dữ liệu khi load trang
+        window.addEventListener('load', checkData);
+    </script>
+</body>
+</html>

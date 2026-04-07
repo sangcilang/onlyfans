@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - Fan Shop</title>
+    <link rel="stylesheet" href="../../shared/css/common.css">
+    <link rel="stylesheet" href="../../shared/css/components.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <main class="container">
+        <div class="register-container">
+            <h2>Đăng ký tài khoản</h2>
+            <form id="register-form" onsubmit="handleRegisterSubmit(event)">
+                <div class="form-group">
+                    <label for="username">Tên đăng nhập</label>
+                    <input type="text" id="username" name="username" placeholder="Nhập tên đăng nhập" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Nhập email của bạn" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mật khẩu</label>
+                    <input type="password" id="password" name="password" placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" required>
+                </div>
+                <button type="submit" class="btn">Đăng ký</button>
+            </form>
+            <p class="login-link">
+                Đã có tài khoản? <a href="../login/index.html">Đăng nhập ngay</a>
+            </p>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="../../shared/js/utils.js"></script>
+    <script src="../../shared/js/auth.js"></script>
+    <script src="../../shared/js/cart.js"></script>
+    <script src="../../shared/js/navigation.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Trị - Fan Shop</title>
+    <script>
+        // Redirect to dashboard
+        window.location.href = 'dashboard/index.html';
+    </script>
+</head>
+<body>
+    <p>Đang chuyển hướng...</p>
+</body>
+</html>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <h3 id="total-users">0</h3>
+                        <p>Người dùng</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <h3 id="total-products">11</h3>
+                        <p>Sản phẩm</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🛒</div>
+                    <div class="stat-info">
+                        <h3 id="total-orders">0</h3>
+                        <p>Đơn hàng</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <h3 id="total-revenue">0đ</h3>
+                        <p>Doanh thu</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>📈 Doanh Thu 7 Ngày Gần Đây</h3>
+                    <canvas id="revenueChart"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <h3>📊 Trạng Thái Đơn Hàng</h3>
+                    <canvas id="orderStatusChart"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <h3>🏆 Top 5 Sản Phẩm Bán Chạy</h3>
+                    <canvas id="topProductsChart"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <h3>👥 Người Dùng Mới Theo Tháng</h3>
+                    <canvas id="newUsersChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section" id="orders-section">
+            <div class="admin-section">
+                <h2>🛒 Quản Lý Đơn Hàng</h2>
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Mã ĐH</th>
+                                    <th>Khách hàng</th>
+                                    <th>Sản phẩm</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày đặt</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table">
+                                <tr>
+                                    <td colspan="7" class="empty-msg">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section" id="inventory-section">
+            <div class="admin-section">
+                <h2>📊 Quản Lý Kho</h2>
+                    <div class="inventory-alert" id="low-stock-alert" style="display: none;">
+                        <span class="alert-icon">⚠️</span>
+                        <span id="low-stock-message">Có sản phẩm sắp hết hàng!</span>
+                    </div>
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Giá</th>
+                                    <th>Tồn kho</th>
+                                    <th>Đã bán</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table">
+                                <tr>
+                                    <td colspan="7" class="empty-msg">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section" id="products-section">
+            <div class="admin-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2 style="margin: 0;">📦 Quản Lý Sản Phẩm</h2>
+                        <button class="btn" onclick="showAddProductForm()">+ Thêm sản phẩm</button>
+                    </div>
+                    
+                    <div id="add-product-form" style="display: none; margin-bottom: 24px;">
+                        <div class="form-card">
+                            <h3 id="product-form-title">Thêm Sản Phẩm Mới</h3>
+                            <input type="hidden" id="product-id">
+                            <div class="form-group">
+                                <label>Tên sản phẩm</label>
+                                <input type="text" id="product-name" placeholder="Nhập tên sản phẩm">
+                            </div>
+                            <div class="form-group">
+                                <label>Giá (VNĐ)</label>
+                                <input type="number" id="product-price" placeholder="450000">
+                            </div>
+                            <div class="form-group">
+                                <label>URL hình ảnh</label>
+                                <input type="text" id="product-image" placeholder="https://...">
+                            </div>
+                            <div class="form-group">
+                                <label>Badge</label>
+                                <input type="text" id="product-badge" placeholder="Yêu thích, Bán chạy, Mall...">
+                            </div>
+                            <div class="form-group">
+                                <label>Đã bán</label>
+                                <input type="text" id="product-sold" placeholder="1,2k">
+                            </div>
+                            <div class="form-group">
+                                <label>Tồn kho</label>
+                                <input type="number" id="product-stock" placeholder="100" value="100">
+                            </div>
+                            <div style="display: flex; gap: 12px;">
+                                <button class="btn" onclick="saveProduct()">Lưu sản phẩm</button>
+                                <button class="btn btn-secondary" onclick="hideProductForm()">Hủy</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Giá</th>
+                                    <th>Badge</th>
+                                    <th>Đã bán</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="products-table">
+                                <tr>
+                                    <td colspan="6" class="empty-msg">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section" id="users-section">
+            <div class="admin-section">
+                    <h2>👥 Quản Lý Người Dùng</h2>
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tên đăng nhập</th>
+                                    <th>Email</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table">
+                                <tr>
+                                    <td colspan="5" class="empty-msg">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section" id="posts-section">
+            <div class="admin-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2 style="margin: 0;">📰 Quản Lý Tin Tức</h2>
+                        <button class="btn" onclick="showAddPostForm()">+ Thêm bài viết</button>
+                    </div>
+                    
+                    <div id="add-post-form" style="display: none; margin-bottom: 24px;">
+                        <div class="form-card">
+                            <h3>Thêm Bài Viết Mới</h3>
+                            <div class="form-group">
+                                <label>Tiêu đề</label>
+                                <input type="text" id="post-title" placeholder="Nhập tiêu đề bài viết">
+                            </div>
+                            <div class="form-group">
+                                <label>Danh mục</label>
+                                <select id="post-category">
+                                    <option value="Sản phẩm">Sản phẩm</option>
+                                    <option value="Hướng dẫn">Hướng dẫn</option>
+                                    <option value="Khuyến mãi">Khuyến mãi</option>
+                                    <option value="Công nghệ">Công nghệ</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Mô tả ngắn</label>
+                                <textarea id="post-excerpt" rows="3" placeholder="Nhập mô tả ngắn"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>URL hình ảnh</label>
+                                <input type="text" id="post-image" placeholder="https://...">
+                            </div>
+                            <div style="display: flex; gap: 12px;">
+                                <button class="btn" onclick="addBlogPost()">Thêm bài viết</button>
+                                <button class="btn btn-secondary" onclick="hideAddPostForm()">Hủy</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Danh mục</th>
+                                    <th>Ngày đăng</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="posts-table">
+                                <tr>
+                                    <td colspan="5" class="empty-msg">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section" id="activity-section">
+            <div class="admin-section">
+                    <h2>📊 Hoạt Động Gần Đây</h2>
+                    <div class="activity-list" id="activity-list">
+                        <div class="activity-item">
+                            <span class="activity-icon">ℹ️</span>
+                            <span>Chưa có hoạt động nào</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</div>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="../../shared/js/utils.js"></script>
+    <script src="../../shared/js/auth.js"></script>
+    <script src="../../shared/js/products.js"></script>
+    <script src="../../shared/js/sample-data.js"></script>
+    <script src="../../shared/js/cart.js"></script>
+    <script src="../../shared/js/navigation.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

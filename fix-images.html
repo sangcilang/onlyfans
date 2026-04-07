@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sửa Ảnh - Fan Shop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #10b981, #059669);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 32px;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        
+        .log {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .log-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .btn {
+            padding: 16px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px;
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🔧</div>
+        <h1>Sửa Ảnh Sản Phẩm</h1>
+        
+        <div class="log" id="log"></div>
+        
+        <button class="btn" onclick="fixImages()">
+            🔧 Sửa Ảnh Ngay
+        </button>
+        
+        <button class="btn" onclick="goHome()" style="background: #6b7280;">
+            🏠 Về Trang Chủ
+        </button>
+    </div>
+    
+    <script>
+        const svgImages = [
+            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%2310b981" width="400" height="400"/%3E%3Ctext fill="white" font-size="30" font-family="Arial" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EQuạt 1%3C/text%3E%3C/svg%3E',
+            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%233b82f6" width="400" height="400"/%3E%3Ctext fill="white" font-size="30" font-family="Arial" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EQuạt 2%3C/text%3E%3C/svg%3E',
+            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%236366f1" width="400" height="400"/%3E%3Ctext fill="white" font-size="30" font-family="Arial" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EQuạt 3%3C/text%3E%3C/svg%3E',
+            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23f59e0b" width="400" height="400"/%3E%3Ctext fill="white" font-size="30" font-family="Arial" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EQuạt 4%3C/text%3E%3C/svg%3E',
+            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23ef4444" width="400" height="400"/%3E%3Ctext fill="white" font-size="30" font-family="Arial" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EQuạt 5%3C/text%3E%3C/svg%3E',
+            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%2314b8a6" width="400" height="400"/%3E%3Ctext fill="white" font-size="30" font-family="Arial" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EQuạt 6%3C/text%3E%3C/svg%3E',
+            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%238b5cf6" width="400" height="400"/%3E%3Ctext fill="white" font-size="30" font-family="Arial" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EQuạt 7%3C/text%3E%3C/svg%3E',
+            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23ec4899" width="400" height="400"/%3E%3Ctext fill="white" font-size="30" font-family="Arial" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EQuạt 8%3C/text%3E%3C/svg%3E',
+            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%2306b6d4" width="400" height="400"/%3E%3Ctext fill="white" font-size="30" font-family="Arial" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EQuạt 9%3C/text%3E%3C/svg%3E',
+            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%2384cc16" width="400" height="400"/%3E%3Ctext fill="white" font-size="30" font-family="Arial" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EQuạt 10%3C/text%3E%3C/svg%3E'
+        ];
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const item = document.createElement('div');
+            item.className = 'log-item';
+            item.textContent = message;
+            logDiv.appendChild(item);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function fixImages() {
+            log('🔍 Đang kiểm tra dữ liệu...');
+            
+            // Get products from localStorage
+            let products = JSON.parse(localStorage.getItem('products')) || [];
+            log(`📦 Tìm thấy ${products.length} sản phẩm`);
+            
+            if (products.length === 0) {
+                log('❌ Không có sản phẩm nào. Vui lòng tạo dữ liệu mẫu trước.');
+                return;
+            }
+            
+            // Update images
+            let updated = 0;
+            products = products.map((product, index) => {
+                const oldImage = product.image;
+                const newImage = svgImages[index % svgImages.length];
+                
+                if (oldImage !== newImage) {
+                    product.image = newImage;
+                    updated++;
+                    log(`✅ Đã cập nhật ảnh cho: ${product.name}`);
+                }
+                
+                return product;
+            });
+            
+            // Save back to localStorage
+            localStorage.setItem('products', JSON.stringify(products));
+            log(`💾 Đã lưu ${updated} sản phẩm với ảnh mới`);
+            
+            // Also fix blog posts
+            let blogPosts = JSON.parse(localStorage.getItem('blogPosts')) || [];
+            if (blogPosts.length > 0) {
+                blogPosts = blogPosts.map((post, index) => {
+                    post.image = svgImages[index % svgImages.length];
+                    return post;
+                });
+                localStorage.setItem('blogPosts', JSON.stringify(blogPosts));
+                log(`📰 Đã cập nhật ${blogPosts.length} bài viết`);
+            }
+            
+            log('✨ Hoàn thành! Đang chuyển về trang chủ...');
+            
+            setTimeout(() => {
+                window.location.href = '/pages/home/index.html';
+            }, 2000);
+        }
+        
+        function goHome() {
+            window.location.href = '/pages/home/index.html';
+        }
+        
+        // Auto run on load
+        window.addEventListener('load', () => {
+            log('👋 Sẵn sàng sửa ảnh!');
+            log('💡 Click nút "Sửa Ảnh Ngay" để bắt đầu');
+        });
+    </script>
+</body>
+</html>
