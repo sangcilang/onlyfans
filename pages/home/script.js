@@ -42,7 +42,7 @@ function loadProducts() {
             
             const productId = this.getAttribute('data-product-id');
             if (productId) {
-                window.location.href = `pages/product-detail/index.html?productId=${productId}`;
+                window.location.href = `../product-detail/index.html?productId=${productId}`;
             }
         });
     });
