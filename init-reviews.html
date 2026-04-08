@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khởi tạo đánh giá mẫu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #10b981;
+            margin-bottom: 20px;
+        }
+        button {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+        button.danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        button.danger:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌟 Khởi tạo đánh giá mẫu</h1>
+        
+        <div class="info">
+            <strong>Lưu ý:</strong> Công cụ này sẽ tạo đánh giá mẫu cho tất cả sản phẩm. 
+            Mỗi sản phẩm sẽ có 3-8 đánh giá ngẫu nhiên với rating từ 3-5 sao.
+        </div>
+        
+        <button onclick="initSampleReviews()">✨ Tạo đánh giá mẫu</button>
+        <button onclick="clearAllReviews()" class="danger">🗑️ Xóa tất cả đánh giá</button>
+        <button onclick="viewReviews()">👁️ Xem đánh giá hiện tại</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script src="shared/js/utils.js"></script>
+    <script src="shared/js/products.js"></script>
+    <script src="shared/js/reviews.js"></script>
+    
+    <script>
+        // Sample user names
+        const sampleUsers = [
+            { id: 'user_1', username: 'Nguyễn Văn A' },
+            { id: 'user_2', username: 'Trần Thị B' },
+            { id: 'user_3', username: 'Lê Văn C' },
+            { id: 'user_4', username: 'Phạm Thị D' },
+            { id: 'user_5', username: 'Hoàng Văn E' },
+            { id: 'user_6', username: 'Vũ Thị F' },
+            { id: 'user_7', username: 'Đặng Văn G' },
+            { id: 'user_8', username: 'Bùi Thị H' },
+            { id: 'user_9', username: 'Đỗ Văn I' },
+            { id: 'user_10', username: 'Ngô Thị K' }
+        ];
+
+        // Sample comments for different ratings
+        const comments = {
+            5: [
+                'Sản phẩm rất tốt, chất lượng vượt mong đợi! Gió mạnh, êm, tiết kiệm điện. Rất hài lòng với lần mua này.',
+                'Tuyệt vời! Đóng gói cẩn thận, giao hàng nhanh. Sản phẩm chất lượng cao, hoạt động êm ái, không ồn.',
+                'Quá hài lòng! Thiết kế đẹp, chất liệu tốt, gió mát rất đều. Shop phục vụ nhiệt tình, giao hàng đúng hẹn.',
+                'Sản phẩm chính hãng, chất lượng tuyệt vời! Gió mạnh mà vẫn êm, tiết kiệm điện. Đáng đồng tiền bát gạo.',
+                'Rất ưng ý! Mua về dùng rất tốt, gió mát, êm. Thiết kế đẹp, phù hợp với mọi không gian. Sẽ ủng hộ shop lâu dài.',
+                'Xuất sắc! Sản phẩm đúng như mô tả, chất lượng cao cấp. Giao hàng nhanh, đóng gói cẩn thận. Rất đáng mua!'
+            ],
+            4: [
+                'Sản phẩm tốt, chất lượng ổn. Gió mát, hoạt động êm. Giá cả hợp lý, đáng mua.',
+                'Khá hài lòng với sản phẩm. Chất lượng tốt, giao hàng nhanh. Một số chi tiết nhỏ cần cải thiện nhưng nhìn chung ok.',
+                'Sản phẩm đẹp, chất lượng tốt. Gió mạnh, êm ái. Giá hơi cao một chút nhưng chấp nhận được.',
+                'Tốt! Đóng gói cẩn thận, giao đúng hẹn. Sản phẩm hoạt động tốt, gió mát. Hài lòng với lần mua này.',
+                'Chất lượng khá, gió mát đều. Thiết kế đẹp mắt. Một vài điểm nhỏ chưa hoàn hảo nhưng tổng thể rất tốt.'
+            ],
+            3: [
+                'Sản phẩm tạm ổn, đúng giá tiền. Gió mát nhưng hơi ồn một chút. Chất lượng chấp nhận được.',
+                'Bình thường, không có gì đặc biệt. Chất lượng trung bình, giá hợp lý. Dùng được.',
+                'Sản phẩm ổn, giao hàng hơi chậm. Chất lượng tạm được, gió mát nhưng không mạnh lắm.',
+                'Tạm được, đúng với giá tiền. Một số chi tiết chưa hoàn thiện lắm nhưng dùng được.'
+            ]
+        };
+
+        /**
+         * Get random element from array
+         */
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        /**
+         * Get random number between min and max
+         */
+        function getRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        /**
+         * Get random date in the past 60 days
+         */
+        function getRandomPastDate() {
+            const now = new Date();
+            const daysAgo = getRandomNumber(1, 60);
+            const date = new Date(now.getTime() - (daysAgo * 24 * 60 * 60 * 1000));
+            return date.toISOString();
+        }
+
+        /**
+         * Initialize sample reviews for all products
+         */
+        function initSampleReviews() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Đang tạo đánh giá mẫu...</p>';
+            
+            try {
+                const products = getAllProducts();
+                let totalReviews = 0;
+                
+                products.forEach(product => {
+                    // Random number of reviews per product (3-8)
+                    const numReviews = getRandomNumber(3, 8);
+                    
+                    // Shuffle users to avoid duplicates
+                    const shuffledUsers = [...sampleUsers].sort(() => Math.random() - 0.5);
+                    
+                    for (let i = 0; i < numReviews && i < shuffledUsers.length; i++) {
+                        const user = shuffledUsers[i];
+                        
+                        // Random rating (weighted towards higher ratings)
+                        const rand = Math.random();
+                        let rating;
+                        if (rand < 0.5) rating = 5;      // 50% chance of 5 stars
+                        else if (rand < 0.8) rating = 4;  // 30% chance of 4 stars
+                        else rating = 3;                  // 20% chance of 3 stars
+                        
+                        // Get random comment for this rating
+                        const comment = getRandomElement(comments[rating]);
+                        
+                        // Create review directly in localStorage (bypass purchase verification)
+                        const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+                        
+                        const review = {
+                            id: `review_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                            userId: user.id,
+                            productId: product.id,
+                            username: user.username,
+                            rating: rating,
+                            comment: comment,
+                            images: [],
+                            createdAt: getRandomPastDate(),
+                            updatedAt: getRandomPastDate(),
+                            isVerifiedPurchaser: true
+                        };
+                        
+                        reviews.push(review);
+                        localStorage.setItem('reviews', JSON.stringify(reviews));
+                        totalReviews++;
+                        
+                        // Small delay to ensure unique IDs
+                        const now = Date.now();
+                        while (Date.now() - now < 2) {}
+                    }
+                });
+                
+                resultDiv.innerHTML = `
+                    <div class="result">
+                        <strong>✅ Thành công!</strong><br>
+                        Đã tạo ${totalReviews} đánh giá mẫu cho ${products.length} sản phẩm.<br>
+                        <small>Bạn có thể xem đánh giá trên trang chi tiết sản phẩm.</small>
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <strong>❌ Lỗi!</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        /**
+         * Clear all reviews
+         */
+        function clearAllReviews() {
+            if (!confirm('Bạn có chắc chắn muốn xóa TẤT CẢ đánh giá?')) {
+                return;
+            }
+            
+            localStorage.removeItem('reviews');
+            
+            document.getElementById('result').innerHTML = `
+                <div class="result">
+                    <strong>✅ Đã xóa!</strong><br>
+                    Tất cả đánh giá đã được xóa khỏi hệ thống.
+                </div>
+            `;
+        }
+
+        /**
+         * View current reviews
+         */
+        function viewReviews() {
+            const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+            const products = getAllProducts();
+            
+            let html = '<div class="result info"><strong>📊 Thống kê đánh giá hiện tại:</strong><br><br>';
+            
+            if (reviews.length === 0) {
+                html += 'Chưa có đánh giá nào trong hệ thống.';
+            } else {
+                html += `Tổng số đánh giá: <strong>${reviews.length}</strong><br><br>`;
+                
+                products.forEach(product => {
+                    const productReviews = reviews.filter(r => r.productId === product.id);
+                    if (productReviews.length > 0) {
+                        const avgRating = (productReviews.reduce((sum, r) => sum + r.rating, 0) / productReviews.length).toFixed(1);
+                        html += `• ${product.name}: <strong>${productReviews.length}</strong> đánh giá (⭐ ${avgRating})<br>`;
+                    }
+                });
+            }
+            
+            html += '</div>';
+            document.getElementById('result').innerHTML = html;
+        }
+
+        // Auto-display current stats on load
+        window.addEventListener('DOMContentLoaded', viewReviews);
+    </script>
+</body>
+</html>
