@@ -124,6 +124,37 @@
     margin-bottom: 32px;
 }
 
+/* Time Filter */
+.time-filter {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.filter-btn:hover {
+    border-color: var(--green-primary);
+    color: var(--green-primary);
+}
+
+.filter-btn.active {
+    background: var(--green-primary);
+    color: white;
+    border-color: var(--green-primary);
+}
+
 .chart-card {
     background: white;
     padding: 24px;

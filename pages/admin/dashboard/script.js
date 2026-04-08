@@ -1,6 +1,191 @@
 // Dashboard page script
 
+// Global state for time filter
+let currentTimePeriod = 'week';
 let revenueChart, orderStatusChart, topProductsChart, newUsersChart;
+
+/**
+ * Calculate start date based on time period
+ * @param {string} period - 'week' | 'month' | 'year'
+ * @returns {Date} Start date for filtering
+ */
+function getStartDate(period) {
+    const now = new Date();
+    const startDate = new Date(now);
+    
+    switch(period) {
+        case 'week':
+            startDate.setDate(now.getDate() - 7);
+            break;
+        case 'month':
+            startDate.setDate(now.getDate() - 30);
+            break;
+        case 'year':
+            startDate.setDate(now.getDate() - 365);
+            break;
+    }
+    
+    startDate.setHours(0, 0, 0, 0);
+    return startDate;
+}
+
+/**
+ * Filter data by date range
+ * @param {Array} data - Array of objects with createdAt property
+ * @param {Date} startDate - Start date for filtering
+ * @returns {Array} Filtered data
+ */
+function filterByDateRange(data, startDate) {
+    if (!data || !Array.isArray(data)) {
+        console.warn('Invalid data provided to filterByDateRange');
+        return [];
+    }
+    
+    const startTime = startDate.getTime();
+    
+    return data.filter(item => {
+        if (!item.createdAt) {
+            console.warn('Item missing createdAt:', item);
+            return false;
+        }
+        
+        const itemDate = new Date(item.createdAt);
+        if (isNaN(itemDate.getTime())) {
+            console.warn('Invalid date format:', item.createdAt);
+            return false;
+        }
+        
+        return itemDate.getTime() >= startTime;
+    });
+}
+
+/**
+ * Aggregate orders by day
+ * @param {Array} orders - Filtered orders
+ * @param {string} period - 'week' or 'month'
+ * @returns {Object} { labels: string[], data: number[] }
+ */
+function aggregateByDay(orders, period) {
+    const days = period === 'week' ? 7 : 30;
+    const labels = [];
+    const data = [];
+    
+    for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toLocaleDateString('vi-VN', { 
+            day: '2-digit', 
+            month: '2-digit' 
+        });
+        labels.push(dateStr);
+        
+        const dayRevenue = orders
+            .filter(order => {
+                const orderDate = new Date(order.createdAt);
+                return orderDate.toDateString() === date.toDateString() 
+                    && order.status !== 'Đã hủy';
+            })
+            .reduce((sum, order) => sum + (order.total || 0), 0);
+        
+        data.push(dayRevenue);
+    }
+    
+    return { labels, data };
+}
+
+/**
+ * Aggregate orders by month
+ * @param {Array} orders - Filtered orders
+ * @returns {Object} { labels: string[], data: number[] }
+ */
+function aggregateByMonth(orders) {
+    const labels = [];
+    const data = [];
+    
+    for (let i = 11; i >= 0; i--) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        const monthStr = date.toLocaleDateString('vi-VN', { 
+            month: '2-digit', 
+            year: 'numeric' 
+        });
+        labels.push(monthStr);
+        
+        const monthRevenue = orders
+            .filter(order => {
+                const orderDate = new Date(order.createdAt);
+                return orderDate.getMonth() === date.getMonth() 
+                    && orderDate.getFullYear() === date.getFullYear()
+                    && order.status !== 'Đã hủy';
+            })
+            .reduce((sum, order) => sum + (order.total || 0), 0);
+        
+        data.push(monthRevenue);
+    }
+    
+    return { labels, data };
+}
+
+/**
+ * Aggregate users by day
+ * @param {Array} users - Filtered users
+ * @param {string} period - 'week' or 'month'
+ * @returns {Object} { labels: string[], data: number[] }
+ */
+function aggregateUsersByDay(users, period) {
+    const days = period === 'week' ? 7 : 30;
+    const labels = [];
+    const data = [];
+    
+    for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toLocaleDateString('vi-VN', { 
+            day: '2-digit', 
+            month: '2-digit' 
+        });
+        labels.push(dateStr);
+        
+        const dayUsers = users.filter(user => {
+            const userDate = new Date(user.createdAt);
+            return userDate.toDateString() === date.toDateString();
+        }).length;
+        
+        data.push(dayUsers);
+    }
+    
+    return { labels, data };
+}
+
+/**
+ * Aggregate users by month
+ * @param {Array} users - Filtered users
+ * @returns {Object} { labels: string[], data: number[] }
+ */
+function aggregateUsersByMonth(users) {
+    const labels = [];
+    const data = [];
+    
+    for (let i = 11; i >= 0; i--) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        const monthStr = date.toLocaleDateString('vi-VN', { 
+            month: '2-digit', 
+            year: 'numeric' 
+        });
+        labels.push(monthStr);
+        
+        const monthUsers = users.filter(user => {
+            const userDate = new Date(user.createdAt);
+            return userDate.getMonth() === date.getMonth() 
+                && userDate.getFullYear() === date.getFullYear();
+        }).length;
+        
+        data.push(monthUsers);
+    }
+    
+    return { labels, data };
+}
 
 /**
  * Check if user is admin
@@ -65,29 +250,20 @@ function loadStatistics() {
 /**
  * Revenue Chart - Line Chart
  */
-function initRevenueChart() {
+function updateRevenueChart() {
     const ctx = document.getElementById('revenueChart');
     if (!ctx) return;
     
     const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const startDate = getStartDate(currentTimePeriod);
+    const filteredOrders = filterByDateRange(orders, startDate);
     
-    const last7Days = [];
-    const revenueData = [];
+    let labels, data;
     
-    for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const dateStr = date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
-        last7Days.push(dateStr);
-        
-        const dayRevenue = orders
-            .filter(order => {
-                const orderDate = new Date(order.createdAt);
-                return orderDate.toDateString() === date.toDateString() && order.status !== 'Đã hủy';
-            })
-            .reduce((sum, order) => sum + (order.total || 0), 0);
-        
-        revenueData.push(dayRevenue);
+    if (currentTimePeriod === 'year') {
+        ({ labels, data } = aggregateByMonth(filteredOrders));
+    } else {
+        ({ labels, data } = aggregateByDay(filteredOrders, currentTimePeriod));
     }
     
     if (revenueChart) revenueChart.destroy();
@@ -95,10 +271,10 @@ function initRevenueChart() {
     revenueChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: last7Days,
+            labels: labels,
             datasets: [{
                 label: 'Doanh thu (VNĐ)',
-                data: revenueData,
+                data: data,
                 borderColor: '#10b981',
                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
                 tension: 0.4,
@@ -135,11 +311,13 @@ function initRevenueChart() {
 /**
  * Order Status Chart - Doughnut Chart
  */
-function initOrderStatusChart() {
+function updateOrderStatusChart() {
     const ctx = document.getElementById('orderStatusChart');
     if (!ctx) return;
     
     const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const startDate = getStartDate(currentTimePeriod);
+    const filteredOrders = filterByDateRange(orders, startDate);
     
     const statusCount = {
         'Đang xử lý': 0,
@@ -149,7 +327,7 @@ function initOrderStatusChart() {
         'Đã hủy': 0
     };
     
-    orders.forEach(order => {
+    filteredOrders.forEach(order => {
         if (statusCount[order.status] !== undefined) {
             statusCount[order.status]++;
         }
@@ -181,37 +359,41 @@ function initOrderStatusChart() {
 /**
  * Top Products Chart - Bar Chart
  */
-function initTopProductsChart() {
+function updateTopProductsChart() {
     const ctx = document.getElementById('topProductsChart');
     if (!ctx) return;
     
-    const products = getAllProducts();
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const startDate = getStartDate(currentTimePeriod);
+    const filteredOrders = filterByDateRange(orders, startDate);
     
-    const productsWithSales = products.map(product => {
-        let soldNumber = 0;
-        const soldText = product.sold || '0';
-        
-        if (soldText.includes('k')) {
-            soldNumber = parseFloat(soldText.replace('k', '')) * 1000;
-        } else {
-            soldNumber = parseInt(soldText.replace(/[^0-9]/g, '')) || 0;
+    // Count products from filtered orders
+    const productCount = {};
+    filteredOrders.forEach(order => {
+        if (order.items && Array.isArray(order.items)) {
+            order.items.forEach(item => {
+                productCount[item.name] = (productCount[item.name] || 0) + (item.quantity || 1);
+            });
         }
-        
-        return { name: product.name, sold: soldNumber };
     });
     
-    productsWithSales.sort((a, b) => b.sold - a.sold);
-    const top5 = productsWithSales.slice(0, 5);
+    // Sort and get top 5
+    const sortedProducts = Object.entries(productCount)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+    
+    const labels = sortedProducts.map(p => p[0].substring(0, 20) + '...');
+    const data = sortedProducts.map(p => p[1]);
     
     if (topProductsChart) topProductsChart.destroy();
     
     topProductsChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: top5.map(p => p.name.substring(0, 20) + '...'),
+            labels: labels,
             datasets: [{
                 label: 'Đã bán',
-                data: top5.map(p => p.sold),
+                data: data,
                 backgroundColor: '#10b981',
                 borderRadius: 8
             }]
@@ -228,37 +410,31 @@ function initTopProductsChart() {
 /**
  * New Users Chart - Bar Chart
  */
-function initNewUsersChart() {
+function updateNewUsersChart() {
     const ctx = document.getElementById('newUsersChart');
     if (!ctx) return;
     
     const users = JSON.parse(localStorage.getItem('users')) || [];
-    const monthsData = {};
+    const startDate = getStartDate(currentTimePeriod);
+    const filteredUsers = filterByDateRange(users, startDate);
     
-    for (let i = 5; i >= 0; i--) {
-        const date = new Date();
-        date.setMonth(date.getMonth() - i);
-        const monthKey = date.toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' });
-        monthsData[monthKey] = 0;
+    let labels, data;
+    
+    if (currentTimePeriod === 'year') {
+        ({ labels, data } = aggregateUsersByMonth(filteredUsers));
+    } else {
+        ({ labels, data } = aggregateUsersByDay(filteredUsers, currentTimePeriod));
     }
-    
-    users.forEach(user => {
-        const userDate = new Date(user.createdAt);
-        const monthKey = userDate.toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' });
-        if (monthsData[monthKey] !== undefined) {
-            monthsData[monthKey]++;
-        }
-    });
     
     if (newUsersChart) newUsersChart.destroy();
     
     newUsersChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: Object.keys(monthsData),
+            labels: labels,
             datasets: [{
                 label: 'Người dùng mới',
-                data: Object.values(monthsData),
+                data: data,
                 backgroundColor: '#3b82f6',
                 borderRadius: 8
             }]
@@ -277,11 +453,56 @@ function initNewUsersChart() {
     });
 }
 
+/**
+ * Refresh all charts with current time period
+ */
+function refreshAllCharts() {
+    updateRevenueChart();
+    updateOrderStatusChart();
+    updateTopProductsChart();
+    updateNewUsersChart();
+}
+
+/**
+ * Initialize time filter component
+ */
+function initTimeFilter() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', handleFilterChange);
+    });
+}
+
+/**
+ * Handle filter button click
+ * @param {Event} event - Click event
+ */
+function handleFilterChange(event) {
+    const period = event.target.dataset.period;
+    
+    if (!['week', 'month', 'year'].includes(period)) {
+        console.error('Invalid time period:', period);
+        return;
+    }
+    
+    currentTimePeriod = period;
+    
+    // Update UI
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Refresh all charts
+    refreshAllCharts();
+}
+
 // Initialize dashboard
 if (checkAdminAccess()) {
     loadStatistics();
-    initRevenueChart();
-    initOrderStatusChart();
-    initTopProductsChart();
-    initNewUsersChart();
+    initTimeFilter();
+    updateRevenueChart();
+    updateOrderStatusChart();
+    updateTopProductsChart();
+    updateNewUsersChart();
 }
