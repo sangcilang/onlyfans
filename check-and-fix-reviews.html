@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiểm tra và Sửa Đánh Giá</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #10b981;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        button {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+        button.danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        button.danger:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+        .status-box {
+            background: #f0f9ff;
+            border: 2px solid #0ea5e9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .status-box h3 {
+            margin-top: 0;
+            color: #0369a1;
+        }
+        .status-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #e0f2fe;
+        }
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        .status-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 200px;
+        }
+        .status-value {
+            color: #0369a1;
+        }
+        .error-box {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .error-box h3 {
+            margin-top: 0;
+            color: #991b1b;
+        }
+        .success-box {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .success-box h3 {
+            margin-top: 0;
+            color: #065f46;
+        }
+        .warning-box {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .warning-box h3 {
+            margin-top: 0;
+            color: #92400e;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            max-height: 300px;
+            font-size: 12px;
+        }
+        .product-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .product-item {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .product-name {
+            font-weight: bold;
+            flex: 1;
+        }
+        .product-id {
+            color: #666;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .review-count {
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Kiểm tra và Sửa Hệ Thống Đánh Giá</h1>
+        <p class="subtitle">Công cụ này giúp bạn kiểm tra và sửa các vấn đề với hệ thống đánh giá sản phẩm</p>
+        
+        <div>
+            <button onclick="checkStatus()">🔍 Kiểm tra Tình Trạng</button>
+            <button onclick="generateReviews()">✨ Tạo Đánh Giá Mẫu</button>
+            <button onclick="clearAllReviews()" class="danger">🗑️ Xóa Tất Cả Đánh Giá</button>
+        </div>
+        
+        <div id="result"></div>
+    </div>
+
+    <script src="shared/js/utils.js"></script>
+    <script src="shared/js/products.js"></script>
+    <script src="shared/js/reviews.js"></script>
+    
+    <script>
+        // Sample users
+        const sampleUsers = [
+            { id: 'user_1', username: 'Nguyễn Văn A' },
+            { id: 'user_2', username: 'Trần Thị B' },
+            { id: 'user_3', username: 'Lê Văn C' },
+            { id: 'user_4', username: 'Phạm Thị D' },
+            { id: 'user_5', username: 'Hoàng Văn E' },
+            { id: 'user_6', username: 'Vũ Thị F' },
+            { id: 'user_7', username: 'Đặng Văn G' },
+            { id: 'user_8', username: 'Bùi Thị H' }
+        ];
+
+        // Sample comments
+        const comments = {
+            5: [
+                'Sản phẩm rất tốt, chất lượng vượt mong đợi! Gió mạnh, êm, tiết kiệm điện. Rất hài lòng với lần mua này.',
+                'Tuyệt vời! Đóng gói cẩn thận, giao hàng nhanh. Sản phẩm chất lượng cao, hoạt động êm ái, không ồn.',
+                'Quá hài lòng! Thiết kế đẹp, chất liệu tốt, gió mát rất đều. Shop phục vụ nhiệt tình, giao hàng đúng hẹn.'
+            ],
+            4: [
+                'Sản phẩm tốt, chất lượng ổn. Gió mát, hoạt động êm. Giá cả hợp lý, đáng mua.',
+                'Khá hài lòng với sản phẩm. Chất lượng tốt, giao hàng nhanh. Một số chi tiết nhỏ cần cải thiện nhưng nhìn chung ok.'
+            ],
+            3: [
+                'Sản phẩm tạm ổn, đúng giá tiền. Gió mát nhưng hơi ồn một chút. Chất lượng chấp nhận được.',
+                'Bình thường, không có gì đặc biệt. Chất lượng trung bình, giá hợp lý. Dùng được.'
+            ]
+        };
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function getRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function getRandomPastDate() {
+            const now = new Date();
+            const daysAgo = getRandomNumber(1, 60);
+            return new Date(now.getTime() - (daysAgo * 24 * 60 * 60 * 1000)).toISOString();
+        }
+
+        function checkStatus() {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                const products = getAllProducts();
+                const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+                
+                // Get unique product IDs from reviews
+                const reviewProductIds = [...new Set(reviews.map(r => r.productId))];
+                const actualProductIds = products.map(p => p.id);
+                
+                // Find matching and orphaned IDs
+                const matchingIds = reviewProductIds.filter(id => actualProductIds.includes(id));
+                const orphanedIds = reviewProductIds.filter(id => !actualProductIds.includes(id));
+                
+                // Count reviews per product
+                const reviewsPerProduct = {};
+                products.forEach(p => {
+                    reviewsPerProduct[p.id] = reviews.filter(r => r.productId === p.id).length;
+                });
+                
+                let html = '<div class="status-box"><h3>📊 Tình Trạng Hệ Thống</h3>';
+                html += `<div class="status-item"><span class="status-label">Tổng số sản phẩm:</span><span class="status-value">${products.length}</span></div>`;
+                html += `<div class="status-item"><span class="status-label">Tổng số đánh giá:</span><span class="status-value">${reviews.length}</span></div>`;
+                html += `<div class="status-item"><span class="status-label">Sản phẩm có đánh giá:</span><span class="status-value">${matchingIds.length}</span></div>`;
+                html += `<div class="status-item"><span class="status-label">Đánh giá không hợp lệ:</span><span class="status-value">${orphanedIds.length > 0 ? orphanedIds.length + ' ❌' : '0 ✅'}</span></div>`;
+                html += '</div>';
+                
+                if (orphanedIds.length > 0) {
+                    html += '<div class="error-box"><h3>⚠️ Phát Hiện Vấn Đề!</h3>';
+                    html += `<p>Có ${orphanedIds.length} đánh giá tham chiếu đến sản phẩm không tồn tại.</p>`;
+                    html += '<p><strong>Nguyên nhân:</strong> Sản phẩm đã được tạo lại với ID mới nhưng đánh giá cũ vẫn tham chiếu đến ID cũ.</p>';
+                    html += '<p><strong>Giải pháp:</strong> Click nút "Tạo Đánh Giá Mẫu" để tạo lại đánh giá với ID sản phẩm hiện tại.</p>';
+                    html += '</div>';
+                }
+                
+                // Show products with review counts
+                html += '<div class="status-box"><h3>📦 Danh Sách Sản Phẩm và Đánh Giá</h3>';
+                html += '<div class="product-list">';
+                products.forEach(p => {
+                    const count = reviewsPerProduct[p.id] || 0;
+                    html += `<div class="product-item">`;
+                    html += `<span class="product-name">${p.name}</span>`;
+                    html += `<span class="product-id">${p.id}</span>`;
+                    html += `<span class="review-count">${count} đánh giá</span>`;
+                    html += `</div>`;
+                });
+                html += '</div></div>';
+                
+                if (reviews.length === 0) {
+                    html += '<div class="warning-box"><h3>💡 Chưa Có Đánh Giá</h3>';
+                    html += '<p>Hệ thống chưa có đánh giá nào. Click nút "Tạo Đánh Giá Mẫu" để tạo dữ liệu mẫu.</p>';
+                    html += '</div>';
+                }
+                
+                resultDiv.innerHTML = html;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error-box">
+                        <h3>❌ Lỗi</h3>
+                        <p>${error.message}</p>
+                        <pre>${error.stack}</pre>
+                    </div>
+                `;
+            }
+        }
+
+        function generateReviews() {
+            if (!confirm('Tạo đánh giá mẫu cho tất cả sản phẩm? (Sẽ xóa đánh giá cũ nếu có)')) {
+                return;
+            }
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="status-box"><h3>⏳ Đang tạo đánh giá...</h3></div>';
+            
+            try {
+                // Clear old reviews
+                localStorage.removeItem('reviews');
+                
+                const products = getAllProducts();
+                let totalReviews = 0;
+                
+                products.forEach(product => {
+                    const numReviews = getRandomNumber(3, 7);
+                    const shuffledUsers = [...sampleUsers].sort(() => Math.random() - 0.5);
+                    
+                    for (let i = 0; i < numReviews && i < shuffledUsers.length; i++) {
+                        const user = shuffledUsers[i];
+                        
+                        // Random rating (weighted towards higher ratings)
+                        const rand = Math.random();
+                        let rating;
+                        if (rand < 0.5) rating = 5;
+                        else if (rand < 0.8) rating = 4;
+                        else rating = 3;
+                        
+                        const comment = getRandomElement(comments[rating]);
+                        
+                        const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+                        
+                        const review = {
+                            id: `review_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                            userId: user.id,
+                            productId: product.id,
+                            username: user.username,
+                            rating: rating,
+                            comment: comment,
+                            images: [],
+                            createdAt: getRandomPastDate(),
+                            updatedAt: getRandomPastDate(),
+                            isVerifiedPurchaser: true
+                        };
+                        
+                        reviews.push(review);
+                        localStorage.setItem('reviews', JSON.stringify(reviews));
+                        totalReviews++;
+                        
+                        // Small delay for unique IDs
+                        const now = Date.now();
+                        while (Date.now() - now < 2) {}
+                    }
+                });
+                
+                resultDiv.innerHTML = `
+                    <div class="success-box">
+                        <h3>✅ Thành Công!</h3>
+                        <p>Đã tạo <strong>${totalReviews}</strong> đánh giá mẫu cho <strong>${products.length}</strong> sản phẩm.</p>
+                        <p>Bây giờ bạn có thể:</p>
+                        <ul>
+                            <li>Vào trang chủ và click vào bất kỳ sản phẩm nào</li>
+                            <li>Xem đánh giá hiển thị trên trang chi tiết sản phẩm</li>
+                            <li>Click "Kiểm tra Tình Trạng" để xem thống kê</li>
+                        </ul>
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error-box">
+                        <h3>❌ Lỗi</h3>
+                        <p>${error.message}</p>
+                        <pre>${error.stack}</pre>
+                    </div>
+                `;
+            }
+        }
+
+        function clearAllReviews() {
+            if (!confirm('Bạn có chắc chắn muốn XÓA TẤT CẢ đánh giá? Hành động này không thể hoàn tác!')) {
+                return;
+            }
+            
+            localStorage.removeItem('reviews');
+            
+            document.getElementById('result').innerHTML = `
+                <div class="success-box">
+                    <h3>✅ Đã Xóa</h3>
+                    <p>Tất cả đánh giá đã được xóa khỏi hệ thống.</p>
+                </div>
+            `;
+        }
+
+        // Auto-check on load
+        window.addEventListener('DOMContentLoaded', checkStatus);
+    </script>
+</body>
+</html>
