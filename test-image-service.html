@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Image Service</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        .preview {
+            margin: 10px 0;
+        }
+        .preview img {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 5px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Service Test Page</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Validate Image File</h2>
+        <input type="file" id="validateInput" accept="image/*">
+        <button onclick="testValidation()">Validate File</button>
+        <div id="validateResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Convert to Base64</h2>
+        <input type="file" id="convertInput" accept="image/jpeg,image/png,image/gif">
+        <button onclick="testConversion()">Convert to Base64</button>
+        <div id="convertResult" class="result"></div>
+        <div id="convertPreview" class="preview"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Compress Image</h2>
+        <input type="file" id="compressInput" accept="image/jpeg,image/png,image/gif">
+        <label>Max Size (KB): <input type="number" id="maxSizeInput" value="100" min="10" max="1000"></label>
+        <button onclick="testCompression()">Compress Image</button>
+        <div id="compressResult" class="result"></div>
+        <div id="compressPreview" class="preview"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 4: Process Multiple Images</h2>
+        <input type="file" id="multipleInput" accept="image/jpeg,image/png,image/gif" multiple>
+        <button onclick="testMultiple()">Process Images</button>
+        <div id="multipleResult" class="result"></div>
+        <div id="multiplePreview" class="preview"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 5: Vietnamese Aliases</h2>
+        <input type="file" id="aliasInput" accept="image/jpeg,image/png,image/gif">
+        <button onclick="testAliases()">Test Vietnamese Functions</button>
+        <div id="aliasResult" class="result"></div>
+    </div>
+
+    <script src="shared/js/image-service.js"></script>
+    <script>
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.innerHTML = message;
+        }
+
+        async function testValidation() {
+            const input = document.getElementById('validateInput');
+            const file = input.files[0];
+
+            if (!file) {
+                showResult('validateResult', 'Vui lòng chọn một file', 'error');
+                return;
+            }
+
+            const result = validateImageFile(file);
+            
+            if (result.valid) {
+                showResult('validateResult', 
+                    `✓ File hợp lệ!<br>
+                    Tên: ${file.name}<br>
+                    Loại: ${file.type}<br>
+                    Kích thước: ${(file.size / 1024).toFixed(2)} KB`, 
+                    'success'
+                );
+            } else {
+                showResult('validateResult', `✗ ${result.error}`, 'error');
+            }
+        }
+
+        async function testConversion() {
+            const input = document.getElementById('convertInput');
+            const file = input.files[0];
+
+            if (!file) {
+                showResult('convertResult', 'Vui lòng chọn một file', 'error');
+                return;
+            }
+
+            try {
+                showResult('convertResult', 'Đang chuyển đổi...', 'info');
+                const base64 = await convertImageToBase64(file);
+                const sizeKB = ((base64.length * 3) / 4 / 1024).toFixed(2);
+                
+                showResult('convertResult', 
+                    `✓ Chuyển đổi thành công!<br>
+                    Kích thước base64: ${sizeKB} KB<br>
+                    Độ dài chuỗi: ${base64.length} ký tự`, 
+                    'success'
+                );
+
+                // Show preview
+                document.getElementById('convertPreview').innerHTML = 
+                    `<img src="${base64}" alt="Preview">`;
+            } catch (error) {
+                showResult('convertResult', `✗ Lỗi: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCompression() {
+            const input = document.getElementById('compressInput');
+            const file = input.files[0];
+            const maxSize = parseInt(document.getElementById('maxSizeInput').value);
+
+            if (!file) {
+                showResult('compressResult', 'Vui lòng chọn một file', 'error');
+                return;
+            }
+
+            try {
+                showResult('compressResult', 'Đang xử lý...', 'info');
+                
+                // First convert to base64
+                const base64 = await convertImageToBase64(file);
+                const originalSizeKB = ((base64.length * 3) / 4 / 1024).toFixed(2);
+                
+                // Then compress
+                const compressed = await compressImage(base64, maxSize);
+                const compressedSizeKB = ((compressed.length * 3) / 4 / 1024).toFixed(2);
+                const ratio = ((compressedSizeKB / originalSizeKB) * 100).toFixed(1);
+                
+                showResult('compressResult', 
+                    `✓ Nén thành công!<br>
+                    Kích thước gốc: ${originalSizeKB} KB<br>
+                    Kích thước sau nén: ${compressedSizeKB} KB<br>
+                    Tỷ lệ: ${ratio}%`, 
+                    'success'
+                );
+
+                // Show preview
+                document.getElementById('compressPreview').innerHTML = 
+                    `<div>
+                        <div>Ảnh gốc:</div>
+                        <img src="${base64}" alt="Original">
+                        <div>Ảnh đã nén:</div>
+                        <img src="${compressed}" alt="Compressed">
+                    </div>`;
+            } catch (error) {
+                showResult('compressResult', `✗ Lỗi: ${error.message}`, 'error');
+            }
+        }
+
+        async function testMultiple() {
+            const input = document.getElementById('multipleInput');
+            const files = input.files;
+
+            if (!files || files.length === 0) {
+                showResult('multipleResult', 'Vui lòng chọn ít nhất một file', 'error');
+                return;
+            }
+
+            try {
+                showResult('multipleResult', 'Đang xử lý...', 'info');
+                
+                const images = await processImages(files, true, 200);
+                
+                showResult('multipleResult', 
+                    `✓ Xử lý thành công ${images.length} ảnh!`, 
+                    'success'
+                );
+
+                // Show previews
+                let previewHTML = '';
+                images.forEach((img, index) => {
+                    const sizeKB = ((img.length * 3) / 4 / 1024).toFixed(2);
+                    previewHTML += `
+                        <div style="display: inline-block; margin: 10px;">
+                            <img src="${img}" alt="Image ${index + 1}">
+                            <div>Ảnh ${index + 1}: ${sizeKB} KB</div>
+                        </div>
+                    `;
+                });
+                document.getElementById('multiplePreview').innerHTML = previewHTML;
+            } catch (error) {
+                showResult('multipleResult', `✗ Lỗi: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAliases() {
+            const input = document.getElementById('aliasInput');
+            const file = input.files[0];
+
+            if (!file) {
+                showResult('aliasResult', 'Vui lòng chọn một file', 'error');
+                return;
+            }
+
+            try {
+                // Test Vietnamese function names
+                const validation = kiemTraFileAnh(file);
+                
+                if (!validation.valid) {
+                    showResult('aliasResult', `✗ ${validation.error}`, 'error');
+                    return;
+                }
+
+                const base64 = await chuyenAnhSangBase64(file);
+                const compressed = await nenAnh(base64, 150);
+                
+                showResult('aliasResult', 
+                    `✓ Tất cả hàm tiếng Việt hoạt động tốt!<br>
+                    - kiemTraFileAnh() ✓<br>
+                    - chuyenAnhSangBase64() ✓<br>
+                    - nenAnh() ✓`, 
+                    'success'
+                );
+            } catch (error) {
+                showResult('aliasResult', `✗ Lỗi: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

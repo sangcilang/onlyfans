@@ -205,6 +205,10 @@
     gap: 24px;
 }
 
+.product-card {
+    cursor: pointer;
+}
+
 .product-card img {
     width: 100%;
     height: 220px;

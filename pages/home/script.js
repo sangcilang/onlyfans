@@ -20,17 +20,32 @@ function loadProducts() {
     }
     
     productGrid.innerHTML = products.map(product => `
-        <div class="product-card" data-name="${sanitizeInput(product.name)}">
+        <div class="product-card" data-name="${sanitizeInput(product.name)}" data-product-id="${product.id}" style="cursor: pointer;">
             ${product.badge ? `<div class="badge">${sanitizeInput(product.badge)}</div>` : ''}
             <img src="${product.image}" alt="${sanitizeInput(product.name)}" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'">
             <div class="info">
                 <h3>${sanitizeInput(product.name)}</h3>
                 <p class="price">${formatCurrency(product.price)}</p>
                 <p class="sold">Đã bán ${sanitizeInput(product.sold || '0')}</p>
-                <button onclick="addToCart('${sanitizeInput(product.name)}', ${product.price})">Thêm vào giỏ</button>
+                <button onclick="event.stopPropagation(); addToCart('${sanitizeInput(product.name)}', ${product.price})">Thêm vào giỏ</button>
             </div>
         </div>
     `).join('');
+    
+    // Add click event listeners to product cards
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('click', function(event) {
+            // Don't navigate if clicking on the button
+            if (event.target.tagName === 'BUTTON') {
+                return;
+            }
+            
+            const productId = this.getAttribute('data-product-id');
+            if (productId) {
+                window.location.href = `pages/product-detail/index.html?productId=${productId}`;
+            }
+        });
+    });
 }
 
 /**
