@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Review Display</title>
+    <link rel="stylesheet" href="shared/css/common.css">
+    <link rel="stylesheet" href="shared/css/components.css">
+    <link rel="stylesheet" href="pages/product-detail/style.css">
+    <style>
+        body { padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 2px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Review Display Test</h1>
+    
+    <div class="test-section">
+        <h2>Step 1: Check LocalStorage</h2>
+        <button onclick="checkData()">Check Data</button>
+        <pre id="data-check"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 2: Test getReviewsByProduct</h2>
+        <input type="text" id="productId" placeholder="Enter product ID" style="width: 400px; padding: 8px;">
+        <button onclick="testGetReviews()">Get Reviews</button>
+        <pre id="reviews-result"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 3: Test Render Functions</h2>
+        <button onclick="testRender()">Render Reviews</button>
+        
+        <h3>Review Summary:</h3>
+        <div class="review-summary" id="review-summary"></div>
+        
+        <h3>Review List:</h3>
+        <div class="review-list" id="review-list"></div>
+    </div>
+
+    <script src="shared/js/utils.js"></script>
+    <script src="shared/js/auth.js"></script>
+    <script src="shared/js/products.js"></script>
+    <script src="shared/js/reviews.js"></script>
+    
+    <script>
+        function checkData() {
+            const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+            const products = getAllProducts();
+            
+            const output = {
+                totalReviews: reviews.length,
+                totalProducts: products.length,
+                sampleReview: reviews[0],
+                sampleProduct: products[0],
+                reviewProductIds: [...new Set(reviews.map(r => r.productId))],
+                actualProductIds: products.map(p => p.id)
+            };
+            
+            document.getElementById('data-check').textContent = JSON.stringify(output, null, 2);
+        }
+        
+        function testGetReviews() {
+            const productId = document.getElementById('productId').value.trim();
+            if (!productId) {
+                // Use first product
+                const products = getAllProducts();
+                if (products.length > 0) {
+                    document.getElementById('productId').value = products[0].id;
+                    testGetReviews();
+                    return;
+                }
+                alert('No products found!');
+                return;
+            }
+            
+            const reviews = getReviewsByProduct(productId);
+            const avgRating = calculateAverageRating(productId);
+            
+            const output = {
+                productId: productId,
+                reviewCount: reviews.length,
+                averageRating: avgRating,
+                reviews: reviews
+            };
+            
+            document.getElementById('reviews-result').textContent = JSON.stringify(output, null, 2);
+        }
+        
+        function testRender() {
+            const productId = document.getElementById('productId').value.trim();
+            if (!productId) {
+                const products = getAllProducts();
+                if (products.length > 0) {
+                    document.getElementById('productId').value = products[0].id;
+                    testRender();
+                    return;
+                }
+                alert('No products found!');
+                return;
+            }
+            
+            console.log('Testing render for productId:', productId);
+            
+            // Test renderReviewSummary
+            const reviews = getReviewsByProduct(productId);
+            const container = document.getElementById('review-summary');
+            
+            if (reviews.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666;">Chưa có đánh giá nào</p>';
+            } else {
+                const avgRating = calculateAverageRating(productId);
+                const distribution = [5, 4, 3, 2, 1].map(rating => {
+                    const count = reviews.filter(r => r.rating === rating).length;
+                    const percentage = (count / reviews.length) * 100;
+                    return { rating, count, percentage };
+                });
+                
+                container.innerHTML = `
+                    <div class="average-rating">
+                        <div class="rating-number">${avgRating.toFixed(1)}</div>
+                        <div class="rating-stars">
+                            <div class="stars">${'★'.repeat(Math.round(avgRating))}${'☆'.repeat(5 - Math.round(avgRating))}</div>
+                            <div class="total-reviews">${reviews.length} đánh giá</div>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-distribution">
+                        ${distribution.map(d => `
+                            <div class="rating-bar">
+                                <span>${d.rating}★</span>
+                                <div class="bar">
+                                    <div class="fill" style="width: ${d.percentage}%"></div>
+                                </div>
+                                <span>${d.count}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            // Test renderReviewDisplay
+            const listContainer = document.getElementById('review-list');
+            
+            if (reviews.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="no-reviews">
+                        <p>Chưa có đánh giá nào cho sản phẩm này</p>
+                    </div>
+                `;
+            } else {
+                listContainer.innerHTML = reviews.map(review => {
+                    const date = new Date(review.createdAt);
+                    const dateStr = date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    
+                    return `
+                        <div class="review-item">
+                            <div class="review-header">
+                                <div class="user-info">
+                                    <span class="username">${review.username}</span>
+                                    ${review.isVerifiedPurchaser ? '<span class="verified-badge">✓ Đã mua hàng</span>' : ''}
+                                </div>
+                            </div>
+                            
+                            <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
+                            
+                            <div class="review-comment">${review.comment}</div>
+                            
+                            ${review.images && review.images.length > 0 ? `
+                                <div class="review-images">
+                                    ${review.images.map(img => `<img src="${img}" alt="Review image">`).join('')}
+                                </div>
+                            ` : ''}
+                            
+                            <div class="review-date">${dateStr}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            alert('Render complete! Check the sections below.');
+        }
+        
+        // Auto-load data on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            checkData();
+            const products = getAllProducts();
+            if (products.length > 0) {
+                document.getElementById('productId').value = products[0].id;
+            }
+        });
+    </script>
+</body>
+</html>

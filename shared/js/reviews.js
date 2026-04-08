@@ -162,10 +162,14 @@ function deleteReview(reviewId) {
  * Get all reviews for a product
  */
 function getReviewsByProduct(productId) {
+    console.log('[DEBUG] getReviewsByProduct called with productId:', productId);
     const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
-    return reviews
+    console.log('[DEBUG] Total reviews in localStorage:', reviews.length);
+    const filtered = reviews
         .filter(r => r.productId === productId)
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    console.log('[DEBUG] Filtered reviews for product:', filtered.length);
+    return filtered;
 }
 
 /**

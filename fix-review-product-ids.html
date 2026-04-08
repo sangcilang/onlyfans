@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Review Product IDs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #10b981;
+            margin-bottom: 20px;
+        }
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .warning {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+        button.danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        button.danger:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            max-height: 400px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Fix Review Product IDs</h1>
+        
+        <div class="info">
+            <strong>Purpose:</strong> This tool helps fix the issue where reviews have old product IDs that don't match current products.
+            This happens when you regenerate products (run init-data.html) but don't regenerate reviews.
+        </div>
+        
+        <div class="warning">
+            <strong>Warning:</strong> This will DELETE all existing reviews and create new ones with current product IDs.
+            Make sure this is what you want before proceeding.
+        </div>
+        
+        <h2>Current Status</h2>
+        <button onclick="checkStatus()">Check Status</button>
+        <pre id="status"></pre>
+        
+        <h2>Actions</h2>
+        <button onclick="fixReviews()">🔧 Fix Reviews (Delete & Recreate)</button>
+        <button onclick="clearReviews()" class="danger">🗑️ Clear All Reviews</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script src="shared/js/utils.js"></script>
+    <script src="shared/js/products.js"></script>
+    <script src="shared/js/reviews.js"></script>
+    
+    <script>
+        // Sample user names
+        const sampleUsers = [
+            { id: 'user_1', username: 'Nguyễn Văn A' },
+            { id: 'user_2', username: 'Trần Thị B' },
+            { id: 'user_3', username: 'Lê Văn C' },
+            { id: 'user_4', username: 'Phạm Thị D' },
+            { id: 'user_5', username: 'Hoàng Văn E' },
+            { id: 'user_6', username: 'Vũ Thị F' },
+            { id: 'user_7', username: 'Đặng Văn G' },
+            { id: 'user_8', username: 'Bùi Thị H' },
+            { id: 'user_9', username: 'Đỗ Văn I' },
+            { id: 'user_10', username: 'Ngô Thị K' }
+        ];
+
+        const comments = {
+            5: [
+                'Sản phẩm rất tốt, chất lượng vượt mong đợi! Gió mạnh, êm, tiết kiệm điện. Rất hài lòng với lần mua này.',
+                'Tuyệt vời! Đóng gói cẩn thận, giao hàng nhanh. Sản phẩm chất lượng cao, hoạt động êm ái, không ồn.',
+                'Quá hài lòng! Thiết kế đẹp, chất liệu tốt, gió mát rất đều. Shop phục vụ nhiệt tình, giao hàng đúng hẹn.',
+                'Sản phẩm chính hãng, chất lượng tuyệt vời! Gió mạnh mà vẫn êm, tiết kiệm điện. Đáng đồng tiền bát gạo.',
+                'Rất ưng ý! Mua về dùng rất tốt, gió mát, êm. Thiết kế đẹp, phù hợp với mọi không gian. Sẽ ủng hộ shop lâu dài.',
+                'Xuất sắc! Sản phẩm đúng như mô tả, chất lượng cao cấp. Giao hàng nhanh, đóng gói cẩn thận. Rất đáng mua!'
+            ],
+            4: [
+                'Sản phẩm tốt, chất lượng ổn. Gió mát, hoạt động êm. Giá cả hợp lý, đáng mua.',
+                'Khá hài lòng với sản phẩm. Chất lượng tốt, giao hàng nhanh. Một số chi tiết nhỏ cần cải thiện nhưng nhìn chung ok.',
+                'Sản phẩm đẹp, chất lượng tốt. Gió mạnh, êm ái. Giá hơi cao một chút nhưng chấp nhận được.',
+                'Tốt! Đóng gói cẩn thận, giao đúng hẹn. Sản phẩm hoạt động tốt, gió mát. Hài lòng với lần mua này.',
+                'Chất lượng khá, gió mát đều. Thiết kế đẹp mắt. Một vài điểm nhỏ chưa hoàn hảo nhưng tổng thể rất tốt.'
+            ],
+            3: [
+                'Sản phẩm tạm ổn, đúng giá tiền. Gió mát nhưng hơi ồn một chút. Chất lượng chấp nhận được.',
+                'Bình thường, không có gì đặc biệt. Chất lượng trung bình, giá hợp lý. Dùng được.',
+                'Sản phẩm ổn, giao hàng hơi chậm. Chất lượng tạm được, gió mát nhưng không mạnh lắm.',
+                'Tạm được, đúng với giá tiền. Một số chi tiết chưa hoàn thiện lắm nhưng dùng được.'
+            ]
+        };
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function getRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function getRandomPastDate() {
+            const now = new Date();
+            const daysAgo = getRandomNumber(1, 60);
+            const date = new Date(now.getTime() - (daysAgo * 24 * 60 * 60 * 1000));
+            return date.toISOString();
+        }
+
+        function checkStatus() {
+            const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+            const products = getAllProducts();
+            
+            const reviewProductIds = [...new Set(reviews.map(r => r.productId))];
+            const actualProductIds = products.map(p => p.id);
+            
+            const matchingIds = reviewProductIds.filter(id => actualProductIds.includes(id));
+            const orphanedIds = reviewProductIds.filter(id => !actualProductIds.includes(id));
+            
+            const status = {
+                totalReviews: reviews.length,
+                totalProducts: products.length,
+                reviewProductIds: reviewProductIds.length,
+                actualProductIds: actualProductIds.length,
+                matchingProductIds: matchingIds.length,
+                orphanedProductIds: orphanedIds.length,
+                orphanedIds: orphanedIds,
+                issue: orphanedIds.length > 0 ? 'YES - Reviews have old product IDs!' : 'NO - All reviews match current products',
+                recommendation: orphanedIds.length > 0 ? 'Click "Fix Reviews" to regenerate with current product IDs' : 'No action needed'
+            };
+            
+            document.getElementById('status').textContent = JSON.stringify(status, null, 2);
+        }
+
+        function clearReviews() {
+            if (!confirm('Are you sure you want to DELETE ALL reviews? This cannot be undone!')) {
+                return;
+            }
+            
+            localStorage.removeItem('reviews');
+            
+            document.getElementById('result').innerHTML = `
+                <div class="result success">
+                    <strong>✅ Success!</strong><br>
+                    All reviews have been deleted.
+                </div>
+            `;
+            
+            checkStatus();
+        }
+
+        function fixReviews() {
+            if (!confirm('This will DELETE all existing reviews and create new ones. Continue?')) {
+                return;
+            }
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Fixing reviews...</p>';
+            
+            try {
+                // Clear existing reviews
+                localStorage.removeItem('reviews');
+                
+                const products = getAllProducts();
+                let totalReviews = 0;
+                
+                products.forEach(product => {
+                    const numReviews = getRandomNumber(3, 8);
+                    const shuffledUsers = [...sampleUsers].sort(() => Math.random() - 0.5);
+                    
+                    for (let i = 0; i < numReviews && i < shuffledUsers.length; i++) {
+                        const user = shuffledUsers[i];
+                        
+                        const rand = Math.random();
+                        let rating;
+                        if (rand < 0.5) rating = 5;
+                        else if (rand < 0.8) rating = 4;
+                        else rating = 3;
+                        
+                        const comment = getRandomElement(comments[rating]);
+                        
+                        const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+                        
+                        const review = {
+                            id: `review_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                            userId: user.id,
+                            productId: product.id,
+                            username: user.username,
+                            rating: rating,
+                            comment: comment,
+                            images: [],
+                            createdAt: getRandomPastDate(),
+                            updatedAt: getRandomPastDate(),
+                            isVerifiedPurchaser: true
+                        };
+                        
+                        reviews.push(review);
+                        localStorage.setItem('reviews', JSON.stringify(reviews));
+                        totalReviews++;
+                        
+                        const now = Date.now();
+                        while (Date.now() - now < 2) {}
+                    }
+                });
+                
+                resultDiv.innerHTML = `
+                    <div class="result success">
+                        <strong>✅ Success!</strong><br>
+                        Created ${totalReviews} new reviews for ${products.length} products.<br>
+                        All reviews now have current product IDs.<br>
+                        <small>You can now view reviews on product detail pages.</small>
+                    </div>
+                `;
+                
+                checkStatus();
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <strong>❌ Error!</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-check status on load
+        window.addEventListener('DOMContentLoaded', checkStatus);
+    </script>
+</body>
+</html>

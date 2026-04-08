@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Reviews</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Review System Debug Tool</h1>
+    
+    <div class="section">
+        <h2>LocalStorage Data</h2>
+        <button onclick="checkLocalStorage()">Check LocalStorage</button>
+        <button onclick="clearReviews()">Clear Reviews</button>
+        <pre id="localStorage-data">Click "Check LocalStorage" to view data</pre>
+    </div>
+    
+    <div class="section">
+        <h2>Products</h2>
+        <pre id="products-data"></pre>
+    </div>
+    
+    <div class="section">
+        <h2>Test Review Functions</h2>
+        <button onclick="testGetReviews()">Test getReviewsByProduct</button>
+        <pre id="test-results"></pre>
+    </div>
+
+    <script src="shared/js/utils.js"></script>
+    <script src="shared/js/products.js"></script>
+    <script src="shared/js/reviews.js"></script>
+    
+    <script>
+        function checkLocalStorage() {
+            const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            
+            const data = {
+                totalReviews: reviews.length,
+                reviews: reviews,
+                totalProducts: products.length,
+                productIds: products.map(p => ({ id: p.id, name: p.name }))
+            };
+            
+            document.getElementById('localStorage-data').textContent = JSON.stringify(data, null, 2);
+        }
+        
+        function clearReviews() {
+            if (confirm('Are you sure you want to clear all reviews?')) {
+                localStorage.removeItem('reviews');
+                alert('Reviews cleared!');
+                checkLocalStorage();
+            }
+        }
+        
+        function testGetReviews() {
+            const products = getAllProducts();
+            const results = [];
+            
+            products.forEach(product => {
+                const reviews = getReviewsByProduct(product.id);
+                results.push({
+                    productId: product.id,
+                    productName: product.name,
+                    reviewCount: reviews.length,
+                    reviews: reviews
+                });
+            });
+            
+            document.getElementById('test-results').textContent = JSON.stringify(results, null, 2);
+        }
+        
+        // Auto-load on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            checkLocalStorage();
+            
+            const products = getAllProducts();
+            document.getElementById('products-data').textContent = JSON.stringify(
+                products.map(p => ({ id: p.id, name: p.name })),
+                null,
+                2
+            );
+        });
+    </script>
+</body>
+</html>

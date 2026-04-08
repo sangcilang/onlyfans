@@ -436,8 +436,11 @@ function deleteReviewHandler(reviewId) {
  * Render review summary
  */
 function renderReviewSummary(productId) {
+    console.log('[DEBUG] renderReviewSummary called with productId:', productId);
     const container = document.getElementById('review-summary');
+    console.log('[DEBUG] review-summary container:', container);
     const reviews = getReviewsByProduct(productId);
+    console.log('[DEBUG] reviews found:', reviews.length, reviews);
     
     if (reviews.length === 0) {
         container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Chưa có đánh giá nào</p>';
@@ -478,8 +481,11 @@ function renderReviewSummary(productId) {
  * Render review display
  */
 function renderReviewDisplay(productId) {
+    console.log('[DEBUG] renderReviewDisplay called with productId:', productId);
     const container = document.getElementById('review-list');
+    console.log('[DEBUG] review-list container:', container);
     const reviews = getReviewsByProduct(productId);
+    console.log('[DEBUG] reviews for display:', reviews.length, reviews);
     const currentUser = getCurrentUser();
     const currentUserId = currentUser ? currentUser.id : null;
     
@@ -532,7 +538,10 @@ function renderReviewDisplay(productId) {
  * Initialize page
  */
 function initProductDetailPage() {
+    console.log('[DEBUG] initProductDetailPage called');
+    console.log('[DEBUG] Current URL:', window.location.href);
     currentProductId = getProductIdFromURL();
+    console.log('[DEBUG] currentProductId:', currentProductId);
     
     if (!currentProductId) {
         const container = document.getElementById('product-detail-container');
@@ -547,15 +556,29 @@ function initProductDetailPage() {
     }
     
     const product = getProductById(currentProductId);
+    console.log('[DEBUG] product found:', product);
     displayProductInfo(product);
     
     if (product) {
+        // Check if reviews exist in localStorage
+        const allReviews = JSON.parse(localStorage.getItem('reviews')) || [];
+        console.log('[DEBUG] Total reviews in localStorage:', allReviews.length);
+        
         // Update review count in product meta
         updateReviewCount(currentProductId);
         
+        console.log('[DEBUG] About to call renderReviewSummary');
         renderReviewSummary(currentProductId);
+        console.log('[DEBUG] About to call renderReviewForm');
         renderReviewForm(currentProductId);
+        console.log('[DEBUG] About to call renderReviewDisplay');
         renderReviewDisplay(currentProductId);
+        console.log('[DEBUG] All render functions called');
+        
+        // If no reviews exist, show helpful message
+        if (allReviews.length === 0) {
+            console.warn('[DEBUG] No reviews found in localStorage. User may need to run init-reviews.html');
+        }
     }
 }
 
@@ -563,9 +586,12 @@ function initProductDetailPage() {
  * Update review count in product meta
  */
 function updateReviewCount(productId) {
+    console.log('[DEBUG] updateReviewCount called with productId:', productId);
     const reviews = getReviewsByProduct(productId);
     const avgRating = calculateAverageRating(productId);
     const countElement = document.getElementById('product-reviews-count');
+    
+    console.log('[DEBUG] Reviews count:', reviews.length, 'Average rating:', avgRating);
     
     if (countElement) {
         if (reviews.length === 0) {
@@ -573,6 +599,9 @@ function updateReviewCount(productId) {
         } else {
             countElement.innerHTML = `⭐ ${avgRating.toFixed(1)} (${reviews.length} đánh giá)`;
         }
+        console.log('[DEBUG] Updated review count element');
+    } else {
+        console.error('[DEBUG] product-reviews-count element not found!');
     }
 }
 
