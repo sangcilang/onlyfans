@@ -44,8 +44,9 @@ function displayProductInfo(product) {
                 <h1 class="product-name">${product.name}</h1>
                 
                 <div class="product-meta">
-                    <span class="product-sold">Đã bán: ${product.sold || '0'}</span>
-                    ${product.stock !== undefined ? `<span class="product-stock">Còn lại: ${product.stock}</span>` : ''}
+                    <span class="product-sold">📦 Đã bán: ${product.sold || '0'}</span>
+                    ${product.stock !== undefined ? `<span class="product-stock">📊 Còn lại: ${product.stock}</span>` : ''}
+                    <span class="product-reviews" id="product-reviews-count">⭐ Đang tải...</span>
                 </div>
                 
                 <div class="product-price">
@@ -62,6 +63,10 @@ function displayProductInfo(product) {
                         <span class="btn-icon">🛒</span>
                         Thêm vào giỏ hàng
                     </button>
+                    <button id="buy-now-btn" class="btn btn-success btn-large">
+                        <span class="btn-icon">⚡</span>
+                        Mua ngay
+                    </button>
                 </div>
             </div>
         </div>
@@ -70,6 +75,11 @@ function displayProductInfo(product) {
     const addToCartBtn = document.getElementById('add-to-cart-btn');
     if (addToCartBtn) {
         addToCartBtn.addEventListener('click', () => handleAddToCart(product));
+    }
+    
+    const buyNowBtn = document.getElementById('buy-now-btn');
+    if (buyNowBtn) {
+        buyNowBtn.addEventListener('click', () => handleBuyNow(product));
     }
 }
 
@@ -81,6 +91,22 @@ function handleAddToCart(product) {
     
     if (result.success) {
         displayNotification(result.message, 'success');
+    } else {
+        displayNotification(result.message, 'error');
+    }
+}
+
+/**
+ * Handle "Buy Now" functionality
+ */
+function handleBuyNow(product) {
+    const result = addToCart(product.name, product.price);
+    
+    if (result.success) {
+        displayNotification('Đã thêm vào giỏ hàng! Đang chuyển đến trang thanh toán...', 'success');
+        setTimeout(() => {
+            window.location.href = '../cart/index.html';
+        }, 1000);
     } else {
         displayNotification(result.message, 'error');
     }
@@ -524,9 +550,29 @@ function initProductDetailPage() {
     displayProductInfo(product);
     
     if (product) {
+        // Update review count in product meta
+        updateReviewCount(currentProductId);
+        
         renderReviewSummary(currentProductId);
         renderReviewForm(currentProductId);
         renderReviewDisplay(currentProductId);
+    }
+}
+
+/**
+ * Update review count in product meta
+ */
+function updateReviewCount(productId) {
+    const reviews = getReviewsByProduct(productId);
+    const avgRating = calculateAverageRating(productId);
+    const countElement = document.getElementById('product-reviews-count');
+    
+    if (countElement) {
+        if (reviews.length === 0) {
+            countElement.innerHTML = '⭐ Chưa có đánh giá';
+        } else {
+            countElement.innerHTML = `⭐ ${avgRating.toFixed(1)} (${reviews.length} đánh giá)`;
+        }
     }
 }
 
