@@ -32,9 +32,10 @@ function renderHeader() {
                 <a href="${basePath}home/index.html" style="text-decoration: none;">
                     <div class="logo">Fan Shop</div>
                 </a>
-                <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="Săn Deal Quạt Mát Chào Hè...">
+                <div class="search-container" style="position: relative;">
+                    <input type="text" id="searchInput" placeholder="Săn Deal Quạt Mát Chào Hè..." autocomplete="off">
                     <button onclick="searchProduct ? searchProduct() : void(0)">🔍</button>
+                    <div id="search-suggestions" class="search-suggestions" style="display:none;"></div>
                 </div>
                 <div class="cart-icon">
                     <a href="${basePath}cart/index.html">🛒 Giỏ hàng (<span id="cart-count">0</span>)</a>
@@ -126,6 +127,98 @@ function handleLogout() {
 }
 
 /**
+ * Khởi tạo logic gợi ý tìm kiếm cho #searchInput
+ * Gọi sau khi header đã được inject vào DOM
+ */
+function initSearchSuggestions() {
+    const input = document.getElementById('searchInput');
+    const dropdown = document.getElementById('search-suggestions');
+    if (!input || !dropdown) return;
+
+    let debounceTimer = null;
+
+    // Lắng nghe sự kiện gõ phím
+    input.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+        if (!query) {
+            hideSearchSuggestions();
+            return;
+        }
+        debounceTimer = setTimeout(() => {
+            showSearchSuggestions(query);
+        }, 300);
+    });
+
+    // Ẩn dropdown khi nhấn Escape
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            hideSearchSuggestions();
+        }
+    });
+
+    // Ẩn dropdown khi click ra ngoài
+    document.addEventListener('click', function (e) {
+        if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+            hideSearchSuggestions();
+        }
+    });
+}
+
+/**
+ * Lọc và hiển thị gợi ý sản phẩm
+ * @param {string} query - Từ khóa tìm kiếm
+ */
+function showSearchSuggestions(query) {
+    const dropdown = document.getElementById('search-suggestions');
+    if (!dropdown) return;
+
+    try {
+        const products = getAllProducts();
+        const lowerQuery = query.toLowerCase();
+        const matches = products
+            .filter(p => p.name.toLowerCase().includes(lowerQuery))
+            .slice(0, 6);
+
+        if (matches.length === 0) {
+            dropdown.innerHTML = '<div class="suggestion-empty">Không tìm thấy sản phẩm phù hợp</div>';
+        } else {
+            dropdown.innerHTML = matches.map(p => `
+                <div class="suggestion-item" onclick="navigateToProduct('${p.id}')">
+                    <span class="suggestion-name">${sanitizeInput(p.name)}</span>
+                    <span class="suggestion-price">${formatCurrency(p.price)}</span>
+                </div>
+            `).join('');
+        }
+
+        dropdown.style.display = 'block';
+    } catch (err) {
+        console.error('Lỗi khi tải gợi ý tìm kiếm:', err);
+        hideSearchSuggestions();
+    }
+}
+
+/**
+ * Ẩn dropdown gợi ý
+ */
+function hideSearchSuggestions() {
+    const dropdown = document.getElementById('search-suggestions');
+    if (dropdown) {
+        dropdown.style.display = 'none';
+        dropdown.innerHTML = '';
+    }
+}
+
+/**
+ * Điều hướng đến trang chi tiết sản phẩm
+ * @param {string} productId
+ */
+function navigateToProduct(productId) {
+    hideSearchSuggestions();
+    window.location.href = `${getBasePath()}product-detail/index.html?id=${productId}`;
+}
+
+/**
  * Khởi tạo navigation (gọi khi page load)
  */
 function initNavigation() {
@@ -152,6 +245,9 @@ function initNavigation() {
     
     // Update cart count
     updateCartCountUI();
+
+    // Initialize search suggestions
+    initSearchSuggestions();
 }
 
 // Initialize on DOM load

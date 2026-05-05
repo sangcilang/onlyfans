@@ -142,6 +142,39 @@ function updateCartCountUI() {
     }
 }
 
+/**
+ * Cập nhật số lượng của một Cart Item theo delta (+1 hoặc -1).
+ * Nếu quantity sau khi giảm <= 0, item sẽ bị xóa khỏi giỏ hàng.
+ *
+ * @param {number} index - Vị trí của item trong mảng cart (0-based)
+ * @param {number} delta - Thay đổi số lượng: +1 để tăng, -1 để giảm
+ * @returns {Object} - { success: boolean, removed: boolean, message?: string }
+ */
+function updateCartItemQuantity(index, delta) {
+    try {
+        const cart = _loadCart();
+
+        if (index < 0 || index >= cart.length) {
+            return { success: false, message: 'Index không hợp lệ' };
+        }
+
+        const item = cart[index];
+        const newQuantity = item.quantity + delta;
+
+        if (newQuantity <= 0) {
+            removeFromCart(index);
+            return { success: true, removed: true };
+        }
+
+        item.quantity = newQuantity;
+        _saveCart(cart);
+        updateCartCountUI();
+        return { success: true, removed: false };
+    } catch (error) {
+        return { success: false };
+    }
+}
+
 // ============================================
 // ALIAS TIENG VIET - Vietnamese Aliases
 // ============================================
@@ -180,3 +213,8 @@ const laySoLuongGioHang = getCartCount;
  * Cap nhat UI hien thi so luong gio hang
  */
 const capNhatGioHangUI = updateCartCountUI;
+
+/**
+ * Cap nhat so luong gio hang
+ */
+const capNhatSoLuongGioHang = updateCartItemQuantity;

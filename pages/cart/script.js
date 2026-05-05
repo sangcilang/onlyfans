@@ -28,7 +28,7 @@ function renderCart() {
     tableBody.innerHTML = '';
     
     if (cart.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="3" class="empty-msg">Giỏ hàng đang trống. Hãy quay lại trang chủ chọn quạt nhé!</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="4" class="empty-msg">Giỏ hàng đang trống. Hãy quay lại trang chủ chọn quạt nhé!</td></tr>';
         totalDisplay.innerText = "Tổng tiền: 0đ";
         return;
     }
@@ -38,6 +38,16 @@ function renderCart() {
             <tr>
                 <td>${sanitizeInput(item.name)}</td>
                 <td>${formatCurrency(item.price)}</td>
+                <td>
+                    <div class="quantity-control">
+                        <button class="qty-btn qty-minus"
+                                onclick="handleQuantityChange(${index}, -1)"
+                                ${item.quantity <= 1 ? 'disabled' : ''}>−</button>
+                        <span class="qty-display">${item.quantity}</span>
+                        <button class="qty-btn qty-plus"
+                                onclick="handleQuantityChange(${index}, 1)">+</button>
+                    </div>
+                </td>
                 <td><button onclick="handleRemoveItem(${index})" class="remove-btn">Xóa</button></td>
             </tr>
         `;
@@ -53,6 +63,16 @@ function renderCart() {
  */
 function handleRemoveItem(index) {
     removeFromCart(index);
+    renderCart();
+}
+
+/**
+ * Xử lý sự kiện thay đổi số lượng từ UI
+ * @param {number} index
+ * @param {number} delta
+ */
+function handleQuantityChange(index, delta) {
+    updateCartItemQuantity(index, delta);
     renderCart();
 }
 
