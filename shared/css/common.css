@@ -74,9 +74,10 @@ a:has(.logo):hover .logo {
     display: flex;
     background: white;
     border-radius: 12px;
-    overflow: hidden;
+    overflow: visible;
     box-shadow: var(--shadow-md);
     transition: all 0.3s;
+    position: relative;
 }
 
 .search-container:focus-within {
@@ -91,6 +92,7 @@ a:has(.logo):hover .logo {
     outline: none;
     font-size: 15px;
     background: transparent;
+    border-radius: 12px 0 0 12px;
 }
 
 .search-container button {
@@ -101,6 +103,7 @@ a:has(.logo):hover .logo {
     cursor: pointer;
     font-size: 18px;
     transition: all 0.2s;
+    border-radius: 0 12px 12px 0;
 }
 
 .search-container button:hover {
@@ -253,4 +256,64 @@ footer p {
     .container {
         padding: 24px 16px;
     }
+}
+
+/* Search Suggestions Dropdown */
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 0 0 12px 12px;
+    box-shadow: var(--shadow-lg);
+    z-index: 1001;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-top: none;
+}
+
+.suggestion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background: var(--green-lighter);
+}
+
+.suggestion-name {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 500;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 12px;
+}
+
+.suggestion-price {
+    font-size: 13px;
+    color: var(--green-dark);
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.suggestion-empty {
+    padding: 16px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-style: italic;
 }
