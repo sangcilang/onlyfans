@@ -208,17 +208,40 @@ function getCurrentUserLocal() {
 }
 
 // Rename existing products.js functions
+
+/**
+ * Chuẩn hóa sản phẩm — đảm bảo 3 trường mới luôn có giá trị mặc định.
+ * Định nghĩa inline để db-adapter.js không phụ thuộc vào products.js.
+ * @param {Object} product
+ * @returns {Object}
+ */
+function normalizeProductLocal(product) {
+    return {
+        description: '',
+        category: '',
+        specifications: {},
+        ...product
+    };
+}
+
 function getAllProductsLocal() {
-    return JSON.parse(localStorage.getItem('products')) || [];
+    const products = JSON.parse(localStorage.getItem('products')) || [];
+    return products.map(normalizeProductLocal);
 }
 
 function getProductByIdLocal(id) {
-    const products = getAllProductsLocal();
-    return products.find(p => p.id === id);
+    const products = JSON.parse(localStorage.getItem('products')) || [];
+    const product = products.find(p => p.id === id);
+    return product ? normalizeProductLocal(product) : undefined;
 }
 
 function addProductLocal(product) {
-    const products = getAllProductsLocal();
+    // Validation: description không được vượt quá 2000 ký tự
+    if (product.description !== undefined && product.description !== null && product.description.length > 2000) {
+        return { success: false, message: 'Mô tả không được vượt quá 2000 ký tự' };
+    }
+
+    const products = JSON.parse(localStorage.getItem('products')) || [];
     const newProduct = {
         id: Date.now().toString(),
         name: product.name,
@@ -226,6 +249,10 @@ function addProductLocal(product) {
         image: product.image || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=300&fit=crop',
         badge: product.badge || '',
         sold: product.sold || '0',
+        stock: product.stock !== undefined ? parseInt(product.stock) : 100,
+        description: product.description !== undefined ? product.description : '',
+        category: product.category !== undefined ? product.category : '',
+        specifications: product.specifications !== undefined ? product.specifications : {},
         createdAt: new Date().toISOString()
     };
     
@@ -235,18 +262,30 @@ function addProductLocal(product) {
 }
 
 function updateProductLocal(id, updates) {
-    const products = getAllProductsLocal();
+    // Validation: description không được vượt quá 2000 ký tự
+    if (updates.description !== undefined && updates.description !== null && updates.description.length > 2000) {
+        return { success: false, message: 'Mô tả không được vượt quá 2000 ký tự' };
+    }
+
+    const products = JSON.parse(localStorage.getItem('products')) || [];
     const index = products.findIndex(p => p.id === id);
     
     if (index === -1) {
         return null;
     }
-    
+
+    // Xử lý price: dùng giá trị mới nếu có, giữ nguyên nếu không
+    const updatedPrice = updates.price !== undefined ? parseInt(updates.price) : products[index].price;
+
     products[index] = {
         ...products[index],
         ...updates,
-        price: parseInt(updates.price),
-        id: id
+        price: updatedPrice,
+        id: id, // Đảm bảo ID không thay đổi
+        // Giữ nguyên 3 trường mới nếu không cung cấp trong updates
+        description: updates.description !== undefined ? updates.description : (products[index].description || ''),
+        category: updates.category !== undefined ? updates.category : (products[index].category || ''),
+        specifications: updates.specifications !== undefined ? updates.specifications : (products[index].specifications || {})
     };
     
     localStorage.setItem('products', JSON.stringify(products));

@@ -62,6 +62,10 @@ function showAddProductForm() {
     document.getElementById('product-badge').value = '';
     document.getElementById('product-sold').value = '';
     document.getElementById('product-stock').value = '100';
+    document.getElementById('product-category').value = '';
+    document.getElementById('product-description').value = '';
+    document.getElementById('description-char-count').textContent = '0';
+    document.getElementById('description-error').style.display = 'none';
     document.getElementById('add-product-form').style.display = 'block';
 }
 
@@ -84,6 +88,10 @@ function editProduct(productId) {
     document.getElementById('product-badge').value = product.badge || '';
     document.getElementById('product-sold').value = product.sold || '';
     document.getElementById('product-stock').value = product.stock || 100;
+    document.getElementById('product-category').value = product.category || '';
+    document.getElementById('product-description').value = product.description || '';
+    document.getElementById('description-char-count').textContent = (product.description || '').length;
+    document.getElementById('description-error').style.display = 'none';
     document.getElementById('add-product-form').style.display = 'block';
     
     document.getElementById('add-product-form').scrollIntoView({ behavior: 'smooth' });
@@ -97,6 +105,8 @@ function saveProduct() {
     const badge = document.getElementById('product-badge').value.trim();
     const sold = document.getElementById('product-sold').value.trim();
     const stock = document.getElementById('product-stock').value.trim();
+    const category = document.getElementById('product-category').value;
+    const description = document.getElementById('product-description').value;
     
     if (!name || !price) {
         alert('Vui lòng nhập đầy đủ tên và giá sản phẩm');
@@ -107,6 +117,13 @@ function saveProduct() {
         alert('Giá sản phẩm không hợp lệ');
         return;
     }
+
+    if (description.length > 2000) {
+        document.getElementById('description-error').style.display = 'block';
+        return;
+    } else {
+        document.getElementById('description-error').style.display = 'none';
+    }
     
     const productData = {
         name: name,
@@ -114,7 +131,9 @@ function saveProduct() {
         image: image,
         badge: badge,
         sold: sold,
-        stock: stock ? parseInt(stock) : 100
+        stock: stock ? parseInt(stock) : 100,
+        category: category,
+        description: description
     };
     
     if (id) {
@@ -142,3 +161,20 @@ function deleteProductConfirm(productId) {
 if (checkAdminAccess()) {
     loadProductsTable();
 }
+
+// Real-time character counter for product description
+document.addEventListener('DOMContentLoaded', function () {
+    const descriptionTextarea = document.getElementById('product-description');
+    if (descriptionTextarea) {
+        descriptionTextarea.addEventListener('input', function () {
+            const count = this.value.length;
+            document.getElementById('description-char-count').textContent = count;
+            const errorEl = document.getElementById('description-error');
+            if (count > 2000) {
+                errorEl.style.display = 'block';
+            } else {
+                errorEl.style.display = 'none';
+            }
+        });
+    }
+});
