@@ -53,10 +53,7 @@ function displayProductInfo(product) {
                     <span class="price-value">${formatPrice(product.price)}</span>
                 </div>
                 
-                <div class="product-description">
-                    <h3>Mô tả sản phẩm</h3>
-                    <p>${product.description || 'Sản phẩm chất lượng cao, được nhập khẩu chính hãng. Bảo hành đầy đủ theo quy định của nhà sản xuất.'}</p>
-                </div>
+                <section id="description-section" class="description-section"></section>
                 
                 <div class="product-actions">
                     <button id="add-to-cart-btn" class="btn btn-primary btn-large">
@@ -80,6 +77,13 @@ function displayProductInfo(product) {
     const buyNowBtn = document.getElementById('buy-now-btn');
     if (buyNowBtn) {
         buyNowBtn.addEventListener('click', () => handleBuyNow(product));
+    }
+
+    // Task 7.8: Điền nội dung description vào #description-section
+    // Requirements: 2.1, 2.2, 2.3, 2.4, 2.5
+    const descriptionSection = document.getElementById('description-section');
+    if (descriptionSection) {
+        descriptionSection.innerHTML = renderDescriptionHTML(product);
     }
 }
 
@@ -124,6 +128,102 @@ function displayNotification(message, type = 'info') {
  */
 function formatPrice(price) {
     return dinhDangTienTe(price);
+}
+
+/**
+ * Render phần mô tả sản phẩm thành HTML string.
+ * - Nếu description không rỗng: wrap trong <div class="description-text">
+ * - Nếu description rỗng/null: render <p class="description-empty">
+ * - Nếu specifications không rỗng: render <table class="specs-table">
+ * - Nếu specifications rỗng/null: không render phần specs
+ *
+ * @param {Object} product - Đối tượng sản phẩm
+ * @returns {string} HTML string
+ * Requirements: 2.1, 2.2, 2.3, 2.4
+ */
+function renderDescriptionHTML(product) {
+    if (!product) {
+        return '<p class="description-empty">Chưa có mô tả cho sản phẩm này.</p>';
+    }
+
+    let html = '';
+
+    // Description text
+    if (product.description && product.description.trim() !== '') {
+        html += `<div class="description-text">${lamSachDuLieu(product.description)}</div>`;
+    } else {
+        html += '<p class="description-empty">Chưa có mô tả cho sản phẩm này.</p>';
+    }
+
+    // Specifications table
+    const specs = product.specifications;
+    if (specs && typeof specs === 'object' && Object.keys(specs).length > 0) {
+        const rows = Object.entries(specs)
+            .map(([key, value]) => `
+                <tr>
+                    <th>${lamSachDuLieu(String(key))}</th>
+                    <td>${lamSachDuLieu(String(value))}</td>
+                </tr>`)
+            .join('');
+        html += `
+            <table class="specs-table">
+                <tbody>
+                    ${rows}
+                </tbody>
+            </table>`;
+    }
+
+    return html;
+}
+
+/**
+ * Render một Product Card thành HTML string.
+ * Card chứa: ảnh, tên, giá định dạng VND, badge (nếu có).
+ * Toàn bộ card được wrap trong <a href="?productId={id}" class="product-card">.
+ *
+ * @param {Object} product - Đối tượng sản phẩm
+ * @returns {string} HTML string
+ * Requirements: 4.3, 4.4
+ */
+function renderProductCardHTML(product) {
+    const badgeHTML = product.badge
+        ? `<span class="card-badge">${lamSachDuLieu(product.badge)}</span>`
+        : '';
+
+    return `
+        <a href="?productId=${lamSachDuLieu(String(product.id))}" class="product-card">
+            <div class="card-image-wrapper">
+                <img src="${lamSachDuLieu(product.image || '')}" alt="${lamSachDuLieu(product.name || '')}" loading="lazy">
+                ${badgeHTML}
+            </div>
+            <div class="card-info">
+                <p class="card-name">${lamSachDuLieu(product.name || '')}</p>
+                <p class="card-price">${dinhDangTienTe(product.price)}</p>
+            </div>
+        </a>`;
+}
+
+/**
+ * Render phần gợi ý sản phẩm thành HTML string.
+ * - Nếu recommendations rỗng: trả về chuỗi rỗng
+ * - Nếu có kết quả: render tiêu đề và lưới product cards
+ *
+ * @param {Object[]} recommendations - Mảng sản phẩm gợi ý từ getRecommendations()
+ * @returns {string} HTML string
+ * Requirements: 4.1, 4.2
+ */
+function renderRecommendationHTML(recommendations) {
+    if (!recommendations || recommendations.length === 0) {
+        return '';
+    }
+
+    const cardsHTML = recommendations.map(renderProductCardHTML).join('');
+
+    return `
+        <h2>Sản phẩm gợi ý</h2>
+        <div class="recommendation-grid">
+            ${cardsHTML}
+        </div>`;
 }
 
 /**
@@ -578,6 +678,29 @@ function initProductDetailPage() {
         // If no reviews exist, show helpful message
         if (allReviews.length === 0) {
             console.warn('[DEBUG] No reviews found in localStorage. User may need to run init-reviews.html');
+        }
+
+        // Task 7.8: Load recommendations
+        // Requirements: 4.1, 4.2, 5.1, 5.2, 5.5
+        const recommendationSection = document.getElementById('recommendation-section');
+        try {
+            const allProducts = getAllProducts();
+            const recommendations = getRecommendations(currentProductId, allProducts);
+            const recommendationHTML = renderRecommendationHTML(recommendations);
+
+            if (recommendationSection) {
+                if (recommendationHTML) {
+                    recommendationSection.innerHTML = recommendationHTML;
+                    recommendationSection.style.display = 'block';
+                } else {
+                    recommendationSection.style.display = 'none';
+                }
+            }
+        } catch (e) {
+            console.error('[DEBUG] Error loading recommendations:', e);
+            if (recommendationSection) {
+                recommendationSection.style.display = 'none';
+            }
         }
     }
 }
